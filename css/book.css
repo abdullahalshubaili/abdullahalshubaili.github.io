@@ -8,6 +8,8 @@ html {
   margin: 0;
   height: 100%;
   font-size: 20px; 
+  background-color: #2e2f2e;
+
   
 }
 
@@ -151,7 +153,7 @@ img {
     .off-canvas-content .book-content .book-post iframe {
       width: 100%; }
     .off-canvas-content .book-content .book-comments {
-      padding: 0 0 100.0rem 0; }
+      padding: 1%; }
     .off-canvas-content .book-content #disqus_thread {
       margin: 0px 0; }
     .off-canvas-content .book-content .utterances {
