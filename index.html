@@ -5,10 +5,11 @@ permalink: /
 redirect_from:
   - /
 ---
-{% unless site.dash.show_author == false %}
-  {% include author.html %}
-{% endunless %}
+
 <div>
+
+  {% include author.html %}
+
 {% for category in site.categories %}
   <h1>{{ category[0] }}</h1>
   <ul>
