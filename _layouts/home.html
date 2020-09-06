@@ -1,9 +1,9 @@
 ---
 layout: default
 ---
-<!-- {% unless site.dash.show_author == false %}
+{% unless site.dash.show_author == true %}
   {% include author.html %}
-{% endunless %} -->
+{% endunless %}
 {% assign posts_count = paginator.posts | size %}
 {% if posts_count > 0 %}
 

@@ -1,7 +1,7 @@
 <div class="author-box">
      {% if site.avatar_source != "github" and site.github_username %}
         {% capture avatar_image %}
-        {{ "/assets/favicon.png" | relative_url }}
+
         {% endcapture %}
     {% elsif site.plugins contains "liquid-md5" %}
         {% capture avatar_image %}
