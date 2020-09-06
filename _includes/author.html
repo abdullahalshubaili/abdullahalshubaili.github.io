@@ -1,10 +1,9 @@
 <div class="author-box">
 
-    {% if site.plugins %}
-        {% capture avatar_image %}
-        {{ "https://abdullahalshubaili.github.io/assets/favicon.png" | relative_url }}
-        {% endcapture %} 
-    {% endif %}
+
+{% capture avatar_image %}
+    {{ "https://abdullahalshubaili.github.io/assets/favicon.png" | relative_url }}
+{% endcapture %} 
     {% if avatar_image %} 
         <img src="{{ avatar_image }}"  class="author-avatar" alt="Avatar"/>
         Generally in this blog I will be talking about my tech field,
