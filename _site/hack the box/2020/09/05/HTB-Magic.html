@@ -70,6 +70,8 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <p>It looks like we have two ports open for now.</p>
 
+<h1 id="enumeration">Enumeration</h1>
+
 <p>lets take a look at the application hosted on port <strong>80</strong> if any…</p>
 
 <p><img src="/assets/magic/1.png" alt="1" /></p>
@@ -98,6 +100,27 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username=admin'</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">'=&amp;password=admin</span><span class="w">
 </span></code></pre></div></div>
+
+<p>Nice, looks like we have a different response. A redirection from the server <code class="language-plaintext highlighter-rouge">HTTP/1.1 302 Found</code>.</p>
+
+<p><img src="/assets/magic/4.png" alt="4" /></p>
+
+<p>Now we can officially say that we have <strong>SQL Injection</strong> attack.</p>
+
+<h1 id="sqli--more-enumeratation">Sqli &amp; More Enumeratation</h1>
+
+<p>lets grab the login HTTP request from <strong>Repeater</strong> in <strong>Burp Suite</strong> and save to a file.</p>
+
+<p>start sqlmap tools with providing the following options:</p>
+<pre><code class="language-sqlmap">sqlmap -r r -p username --random-agent --level 3 --batch
+</code></pre>
+<p>while this is running, let get to the redirection part.</p>
+
+<p>following redirection leads us to a page where upload functionality exists.</p>
+
+<p>first thing comes to mind is file upload restriction issues, hence the name of the machine is “Magic” and a famous technique to prevent “malicious File Upload” in development word is called “Magic Number”. The developer can implement “Magic Number” and chooses a specific type of file to be accepted and saved on the server. It called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the estenstion and file signature that the developer hardcoded in the application.</p>
+
+<p>Now lets try upload an image.</p>
 
 </div>
 
