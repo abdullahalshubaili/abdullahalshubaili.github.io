@@ -2,7 +2,10 @@
 <html lang="{{ page.lang | default: site.lang | default: "en" }}">
 
   {%- include head.html -%}
-
+  <head>
+    <meta charset="utf-8">
+    <title>{{ page.title }}</title>
+  </head>
   <body>
 
     {%- include header.html -%}
