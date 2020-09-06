@@ -42,6 +42,63 @@
 
 <p>Magic Mahcine has very realistic vulerbaility, specially the one that is related to web application.</p>
 
+<p><img src="/assets/magic/machine.png" alt="machine" /></p>
+
+<h1 id="nmap">Nmap</h1>
+
+<p>First I started with <strong>nmap</strong> tool and provided the option <strong><code class="language-plaintext highlighter-rouge">-A</code></strong>.</p>
+
+<p>here is the result:</p>
+<pre><code class="language-nmap"># Nmap 7.80 scan initiated Sat May 23 01:52:13 2020 as: nmap -A -oN nmap_scan-A 10.10.10.185
+Nmap scan report for 10.10.10.185
+Host is up (0.16s latency).
+Not shown: 998 closed ports
+PORT   STATE SERVICE VERSION
+22/tcp open  ssh     OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0)
+| ssh-hostkey: 
+|   2048 06:d4:89:bf:51:f7:fc:0c:f9:08:5e:97:63:64:8d:ca (RSA)
+|   256 11:a6:92:98:ce:35:40:c7:29:09:4f:6c:2d:74:aa:66 (ECDSA)
+|_  256 71:05:99:1f:a8:1b:14:d6:03:85:53:f8:78:8e:cb:88 (ED25519)
+80/tcp open  http    Apache httpd 2.4.29 ((Ubuntu))
+|_http-server-header: Apache/2.4.29 (Ubuntu)
+|_http-title: Magic Portfolio
+Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Sat May 23 01:52:44 2020 -- 1 IP address (1 host up) scanned in 30.22 seconds
+</code></pre>
+
+<p>It looks like we have two ports open for now.</p>
+
+<p>lets take a look at the application hosted on port <strong>80</strong> if any…</p>
+
+<p><img src="/assets/magic/1.png" alt="1" /></p>
+
+<p>if you noticed, in the bottom left corner there is a login button.</p>
+
+<p><img src="/assets/magic/2.png" alt="2" /></p>
+
+<p>Try default creds like ‘admin:admin’, but nothing worked.</p>
+
+<p>lets started up <strong>Burp Suite</strong> and intercept the traffic and catpure the login request.</p>
+
+<p><img src="/assets/magic/3.png" alt="3" /></p>
+
+<p>now send it to repeater. (CTRL + R) will do it. Since we have the HTTP login request lets manipulate the paremeters. In other word, lets abuse them.</p>
+
+<p>here is the paremeters:</p>
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username=admin&amp;password=admin</span><span class="w">
+</span></code></pre></div></div>
+
+<p>what will happen if we send single qoute before <strong>admin</strong> word…</p>
+
+<p>it appears nothing changed in the response. <code class="language-plaintext highlighter-rouge">200 OK</code> is the server response.</p>
+
+<p>lets try by adding <code class="language-plaintext highlighter-rouge">' or '=</code> as this considered to be DB query. If we get different response or sql errer. Thats mostly means we have SQL Injection vulnerability.</p>
+
+<div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username=admin'</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">'=&amp;password=admin</span><span class="w">
+</span></code></pre></div></div>
+
 </div>
 
 
