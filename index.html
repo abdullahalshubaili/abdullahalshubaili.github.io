@@ -1,10 +1,28 @@
 ---
 layout: home
-title:  "InfoSecBlog"
+title:  "InfoSecBlog2"
 permalink: /
 redirect_from:
   - /
 ---
+<div class="author-box">
+  {% if site.avatar_source != "github" and site.github_username %}
+     {% capture avatar_image %}
+         ./assets/favicon.png
+     {% endcapture %}
+ {% elsif site.plugins contains "liquid-md5" %}
+     {% capture avatar_image %}
+         ./assets/favicon.png
+     {% endcapture %} 
+ {% endif %}
+ {% if avatar_image %} 
+     <img src="{{ avatar_image }}"  class="author-avatar" alt="Avatar"/>
+     Generally in this blog I will be talking about my tech field,
+     specially cyber security.</br><br> <p>Through documentation, information lives for ever. </p>
+ {% endif %}
+{{ site.description }}
+</div>
+
 <div>
 {% include author.html %}
 {% for category in site.categories %}
