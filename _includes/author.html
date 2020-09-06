@@ -5,11 +5,11 @@
         {% endcapture %}
     {% elsif site.plugins contains "liquid-md5" %}
         {% capture avatar_image %}
-            https://gravatar.com/avatar/{{ site.email | downcase | md5 }}?s=256 
+            https://s.gravatar.com/avatar/604faaaf4e81ee55525b83eca1be3edb?s=80
         {% endcapture %} 
     {% endif %}
     {% if avatar_image %} 
-        <img src="/assets/favicon.png" class="author-avatar" alt="Avatar" />
+        <img src="{{ avatar_image }}"  class="author-avatar" alt="Avatar" />
         Generally in this blog I will be talking about my tech field,
         specially cyber security.</br><br> <p>Through documentation, information lives for ever. </p>
     {% endif %}
