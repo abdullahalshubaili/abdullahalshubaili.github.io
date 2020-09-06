@@ -5,6 +5,12 @@ permalink: /
 redirect_from:
   - /
 ---
+{% if avatar_image %} 
+<img src="{{ avatar_image }}"  class="author-avatar" alt="Avatar" />
+Generally in this blog I will be talking about my tech field,
+specially cyber security.</br><br> <p>Through documentation, information lives for ever. </p>
+{% endif %}
+{{ site.description }}
 <div>
 {% for category in site.categories %}
   <h1>{{ category[0] }}</h1>
