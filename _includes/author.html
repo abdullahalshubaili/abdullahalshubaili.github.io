@@ -1,11 +1,11 @@
 <div class="author-box">
      {% if site.avatar_source == "github" and site.github_username %}
         {% capture avatar_image %}
-            https://github.com/{{ site.github_username }}.png
+            /assets/favicon.png
         {% endcapture %}
     {% elsif site.plugins contains "liquid-md5" %}
         {% capture avatar_image %}
-            https://s.gravatar.com/avatar/604faaaf4e81ee55525b83eca1be3edb?s=80
+            /assets/favicon.png
         {% endcapture %} 
     {% endif %}
     {% if avatar_image %} 
