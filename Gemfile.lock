@@ -10,7 +10,7 @@ PATH
 GEM
   remote: https://rubygems.org/
   specs:
-    addressable (2.7.0)
+    addressable (2.8.0)
       public_suffix (>= 2.0.2, < 5.0)
     colorator (1.1.0)
     concurrent-ruby (1.1.7)
@@ -24,7 +24,7 @@ GEM
     i18n (0.9.5)
       concurrent-ruby (~> 1.0)
     jekyll (3.9.0)
-      addressable (~> 2.4)
+      addressable (~> 2.8)
       colorator (~> 1.0)
       em-websocket (~> 0.5)
       i18n (~> 0.7)
@@ -47,10 +47,10 @@ GEM
       nuggets
     jekyll-watch (2.2.1)
       listen (~> 3.0)
-    kramdown (2.3.0)
+    kramdown (2.3.1)
       rexml
     kramdown-parser-gfm (1.1.0)
-      kramdown (~> 2.0)
+      kramdown (~> 2.3)
     liquid (4.0.3)
     liquid-md5 (0.0.3)
       liquid (>= 2.5, < 5.0)
@@ -66,7 +66,7 @@ GEM
     rb-fsevent (0.10.4)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    rexml (3.2.4)
+    rexml (3.2.5)
     rouge (3.22.0)
     safe_yaml (1.0.5)
     sass (3.7.4)
@@ -79,7 +79,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  bundler (~> 2.1.4)
+  bundler (~> 2.2.10)
   jekyll-dash!
   jekyll-tagging
   kramdown-parser-gfm
